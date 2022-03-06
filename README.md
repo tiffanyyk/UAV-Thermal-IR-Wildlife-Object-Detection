@@ -8,7 +8,7 @@
 
 ## Modifications
 * [ ] YOLOR Architecture
-* [ ] CenterNet
+* [ ] CenterNet2
 
 ## Repo Structure 
 Rough repository structure we can follow as we build our project
@@ -26,7 +26,7 @@ ROB498
 └───src (will likely end up with subfolders)
     └───yolor
         |   all the folders from the yolor repo copied into here
-    └───centernet
+    └───centernet2
         |   all the folders from the centernet repo copied into here
 └───tools (TBD)
     |   experiment script (i.e. script that starts the training / testing run)
