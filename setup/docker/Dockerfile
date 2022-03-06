@@ -20,6 +20,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # RUN pip install numpy==1.17.3  
 
 # install required packages for yolor
+RUN pip install Cython
 COPY yolor_requirements.txt /opt/app/requirements.txt
 RUN pip install -r /opt/app/requirements.txt
 
