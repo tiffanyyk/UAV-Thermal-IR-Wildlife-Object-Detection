@@ -1,11 +1,5 @@
 # ROB498
 
-## Setup
-* [ ] Dockerfile and build script
-* [ ] Docker run script
-* [ ] Transfer code from their colab notebook into organized folders in this repo
-* [ ] Form a team on the challenge website
-
 ## TODOs
 * [ ] Setup VSCode with Google Colab - how / what link to follow? (Helen, Aditi)
 * [ ] Docker scripts (Tiffany)
