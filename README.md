@@ -1,5 +1,4 @@
 # ROB498
-
 ## TODOs
 * [ ] Setup VSCode with Google Colab - how / what link to follow? (Helen, Aditi)
 * [ ] Docker scripts (Tiffany)
@@ -12,7 +11,6 @@
   * Where is the code for the YOLOR model architecture? Which component needs to be modified for thermal images?
   * How do we run training / pass in configs & hyperparameters?
 * [ ] CenterNet2
-
 ## Repo Structure 
 Rough repository structure we can follow as we build our project
 ```
