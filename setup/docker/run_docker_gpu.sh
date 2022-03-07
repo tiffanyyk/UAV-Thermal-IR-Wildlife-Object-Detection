@@ -10,7 +10,7 @@ WORKING_DIR=/data/workspace #${HOME}
 
 ## mount paths
 # local paths (in ubuntu)
-WORKSPACE_LOCAL=/mnt/d/year_4/rob498
+WORKSPACE_LOCAL=/home/tiffany/
 DATA_LOCAL=/media/trail/datasets
 
 # paths in container
@@ -19,7 +19,7 @@ DATA_CONTAINER=/data/datasets
 
 # resources
 MEMORY_LIMIT=30g
-NUM_CPUS=6
+NUM_CPUS=8
 INTERACTIVE=1
 GPU_DEVICE=1
 REMOTE=0
@@ -108,8 +108,7 @@ if [[ REMOTE -eq 1 ]]; then
   REMOTE_PORT_MAP="${VM_PORT}:22"
   NETWORK="bridge"
   # need to run container as root for ssh
-  # NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
-  docker run --rm ${IT:-} \
+  NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
     --mount type=bind,source=${WORKSPACE_LOCAL},target=${WORKSPACE_CONTAINER} \
     --mount type=bind,source=${DATA_LOCAL},target=${DATA_CONTAINER} \
     -m ${MEMORY_LIMIT} \
@@ -121,8 +120,7 @@ if [[ REMOTE -eq 1 ]]; then
     --net=${NETWORK:-host} \
     ${IMAGE_NAME}:${TAG}
 else
-  # NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
-  docker run --rm ${IT:-} \
+  NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
     --mount type=bind,source=${WORKSPACE_LOCAL},target=${WORKSPACE_CONTAINER} \
     --mount type=bind,source=${DATA_LOCAL},target=${DATA_CONTAINER} \
     -m ${MEMORY_LIMIT} \
