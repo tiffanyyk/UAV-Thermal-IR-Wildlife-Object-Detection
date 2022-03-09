@@ -22,8 +22,14 @@ ROB498
     └───docker
         |   Dockerfile, build.sh, run.sh, requirements.txt
 └───data
-    │   MOT to COCO format code here
-    └───birdsai
+    │   convert_mot_to_coco.py
+    └───utils
+    └───dataset
+        └───TrainReal (put extracted dataset files here)
+        └───TestReal (put extracted dataset files here)
+        └───coco_format (output from `convert_mot_to_coco.py`)
+            └───TrainReal.json
+            └───TestReal.json
 └───src (will likely end up with subfolders)
     └───yolor
         |   all the folders from the yolor repo copied into here
