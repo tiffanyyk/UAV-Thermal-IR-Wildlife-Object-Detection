@@ -48,7 +48,7 @@ if __name__ == '__main__':
             for i in range(num_images):
                 if (i < image_range[0] or i > image_range[1]):  # should never happen for us
                     continue
-                image_info = {'file_name': '{}/img1/{:06d}.jpg'.format(seq, i + 1),
+                image_info = {'file_name': '{}/{}_{:010d}.jpg'.format(seq, seq, i),
                               'id': image_cnt + i + 1,  # image id across all frames in the dataset
                               'frame_id': i + 1 - image_range[0],  # frame id within the sequence
                               'prev_image_id': image_cnt + i if i > 0 else -1,
@@ -60,35 +60,35 @@ if __name__ == '__main__':
 
             # Process Detection Data
             if split != 'test':
-                det_path = seq_path + 'det/det.txt'
+                # det_path = seq_path + 'det/det.txt'
                 anns = np.loadtxt(ann_path, dtype=np.float32, delimiter=',')
-                dets = np.loadtxt(det_path, dtype=np.float32, delimiter=',')
-                if CREATE_SPLITTED_ANN and ('half' in split):
-                    anns_out = np.array([anns[i] for i in range(anns.shape[0]) if \
-                                         int(anns[i][0]) - 1 >= image_range[0] and \
-                                         int(anns[i][0]) - 1 <= image_range[1]], np.float32)
-                    anns_out[:, 0] -= image_range[0]
-                    gt_out = seq_path + '/gt/gt_{}.txt'.format(split)
-                    fout = open(gt_out, 'w')
-                    for o in anns_out:
-                        fout.write(
-                            '{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:.6f}\n'.format(
-                                int(o[0]),int(o[1]),int(o[2]),int(o[3]),int(o[4]),int(o[5]),
-                                int(o[6]),int(o[7]),o[8]))
-                    fout.close()
-                if CREATE_SPLITTED_DET and ('half' in split):
-                    dets_out = np.array([dets[i] for i in range(dets.shape[0]) if \
-                                         int(dets[i][0]) - 1 >= image_range[0] and \
-                                         int(dets[i][0]) - 1 <= image_range[1]], np.float32)
-                    dets_out[:, 0] -= image_range[0]
-                    det_out = seq_path + '/det/det_{}.txt'.format(split)
-                    dout = open(det_out, 'w')
-                    for o in dets_out:
-                        dout.write(
-                            '{:d},{:d},{:.1f},{:.1f},{:.1f},{:.1f},{:.6f}\n'.format(
-                                int(o[0]),int(o[1]),float(o[2]),float(o[3]),float(o[4]),float(o[5]),
-                                float(o[6])))
-                    dout.close()
+                # dets = np.loadtxt(det_path, dtype=np.float32, delimiter=',')
+                # if CREATE_SPLITTED_ANN and ('half' in split):
+                #     anns_out = np.array([anns[i] for i in range(anns.shape[0]) if \
+                #                          int(anns[i][0]) - 1 >= image_range[0] and \
+                #                          int(anns[i][0]) - 1 <= image_range[1]], np.float32)
+                #     anns_out[:, 0] -= image_range[0]
+                #     gt_out = seq_path + '/gt/gt_{}.txt'.format(split)
+                #     fout = open(gt_out, 'w')
+                #     for o in anns_out:
+                #         fout.write(
+                #             '{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:d},{:.6f}\n'.format(
+                #                 int(o[0]),int(o[1]),int(o[2]),int(o[3]),int(o[4]),int(o[5]),
+                #                 int(o[6]),int(o[7]),o[8]))
+                #     fout.close()
+                # if CREATE_SPLITTED_DET and ('half' in split):
+                #     dets_out = np.array([dets[i] for i in range(dets.shape[0]) if \
+                #                          int(dets[i][0]) - 1 >= image_range[0] and \
+                #                          int(dets[i][0]) - 1 <= image_range[1]], np.float32)
+                #     dets_out[:, 0] -= image_range[0]
+                #     det_out = seq_path + '/det/det_{}.txt'.format(split)
+                #     dout = open(det_out, 'w')
+                #     for o in dets_out:
+                #         dout.write(
+                #             '{:d},{:d},{:.1f},{:.1f},{:.1f},{:.1f},{:.6f}\n'.format(
+                #                 int(o[0]),int(o[1]),float(o[2]),float(o[3]),float(o[4]),float(o[5]),
+                #                 float(o[6])))
+                #     dout.close()
 
                 print(' {} ann images'.format(int(anns[:, 0].max())))
                 for i in range(anns.shape[0]):
