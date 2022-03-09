@@ -46,6 +46,8 @@ RUN pip install -r /opt/app/requirements.txt
 # # need this otherwise numba causes `TypeError: create_target_machine() got an unexpected keyword argument 'jitdebug'`
 # RUN pip install -U llvmlite==0.32.1
 
+# need this for cv2
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
 RUN apt-get update && apt-get install -y ssh openssh-server net-tools
 

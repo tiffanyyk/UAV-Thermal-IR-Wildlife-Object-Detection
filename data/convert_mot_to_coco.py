@@ -2,58 +2,63 @@ import os
 import numpy as np
 import json
 import cv2
+import pdb
 
 # Use the same script for MOT16
 # DATA_PATH = '../../data/mot16/'
-DATA_PATH = '../../data/mot17/'
-OUT_PATH = DATA_PATH + 'annotations/'
-SPLITS = ['train_half', 'val_half', 'train', 'test']
+DATA_PATH = 'dataset/'
+OUT_PATH = 'dataset/'
+SPLITS = ["TrainReal", "TestReal"]  # ['train_half', 'val_half', 'train', 'test']
 HALF_VIDEO = True
 CREATE_SPLITTED_ANN = True
 CREATE_SPLITTED_DET = True
 
 if __name__ == '__main__':
     for split in SPLITS:
-        data_path = DATA_PATH + (split if not HALF_VIDEO else 'train')
-        out_path = OUT_PATH + '{}.json'.format(split)
+        out_path = os.path.join(OUT_PATH, split, "annotations/", '{}.json'.format(split))
+        data_path = os.path.join(DATA_PATH, split, "images/")
         out = {'images': [], 'annotations': [],
                'categories': [{'id': 1, 'name': 'pedestrain'}],
                'videos': []}
-        seqs = os.listdir(data_path)
+        seqs = os.listdir(data_path)  # seqs are folders containing sequences of images
         image_cnt = 0
         ann_cnt = 0
         video_cnt = 0
         for seq in sorted(seqs):
-            if '.DS_Store' in seq:
-                continue
-            if 'mot17' in DATA_PATH and (split != 'test' and not ('FRCNN' in seq)):
-                continue
+            # Process Tracking Data
+            # if '.DS_Store' in seq:
+            #     continue
+            # if 'mot17' in DATA_PATH and (split != 'test' and not ('FRCNN' in seq)):
+            #     continue
             video_cnt += 1
             out['videos'].append({
                 'id': video_cnt,
                 'file_name': seq})
             seq_path = '{}/{}/'.format(data_path, seq)
-            img_path = seq_path + 'img1/'
-            ann_path = seq_path + 'gt/gt.txt'
-            images = os.listdir(img_path)
+            # img_path = seq_path + 'img1/'
+            ann_path = os.path.join(data_path, "..", "annotations", f"{seq}.csv")  # seq_path + 'gt/gt.txt'
+            images = os.listdir(seq_path)  # os.listdir(img_path)
             num_images = len([image for image in images if 'jpg' in image])
-            if HALF_VIDEO and ('half' in split):
-                image_range = [0, num_images // 2] if 'train' in split else \
-                    [num_images // 2 + 1, num_images - 1]
-            else:
-                image_range = [0, num_images - 1]
+            # if HALF_VIDEO and ('half' in split):
+            #     image_range = [0, num_images // 2] if 'train' in split else \
+            #         [num_images // 2 + 1, num_images - 1]
+            # else:
+            #     image_range = [0, num_images - 1]
+            image_range = [0, num_images - 1]
             for i in range(num_images):
-                if (i < image_range[0] or i > image_range[1]):
+                if (i < image_range[0] or i > image_range[1]):  # should never happen for us
                     continue
                 image_info = {'file_name': '{}/img1/{:06d}.jpg'.format(seq, i + 1),
-                              'id': image_cnt + i + 1,
-                              'frame_id': i + 1 - image_range[0],
+                              'id': image_cnt + i + 1,  # image id across all frames in the dataset
+                              'frame_id': i + 1 - image_range[0],  # frame id within the sequence
                               'prev_image_id': image_cnt + i if i > 0 else -1,
                               'next_image_id': \
                                   image_cnt + i + 2 if i < num_images - 1 else -1,
                               'video_id': video_cnt}
                 out['images'].append(image_info)
             print('{}: {} images'.format(seq, num_images))
+
+            # Process Detection Data
             if split != 'test':
                 det_path = seq_path + 'det/det.txt'
                 anns = np.loadtxt(ann_path, dtype=np.float32, delimiter=',')

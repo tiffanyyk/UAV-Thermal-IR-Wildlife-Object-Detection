@@ -131,3 +131,7 @@ dmypy.json
 # IDE
 .idea/
 .vscode-server/
+
+# Dataset files
+TrainReal/
+TestReal/
