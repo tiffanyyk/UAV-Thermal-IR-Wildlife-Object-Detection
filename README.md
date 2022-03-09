@@ -1,11 +1,11 @@
 # ROB498
 ## TODOs
 * [ ] Setup VSCode with Google Colab - how / what link to follow? (Helen, Aditi)
-* [ ] Docker scripts (Tiffany)
-* [ ] Dataset conversion from BIRDSAI to COCO (Isobel, Tiffany)
-  * What is the original width, height, number of channels of the thermal images?
-  * Use a subset of BIRDSAI and run `convert_mot_to_coco.py` on it to verify the script works
-  * Figure out a common location for all of us to store the dataset, relative to the repo (see hardcoded paths in conversion script)
+* [x] Docker scripts (Tiffany)
+* [x] Dataset conversion from BIRDSAI to COCO (Isobel, Tiffany)
+  * [x] What is the original width, height, number of channels of the thermal images? (698, 520), (698, 519), (640, 512) **we'll need resizing code**
+  * [x] Use a subset of BIRDSAI and run `convert_mot_to_coco.py` on it to verify the script works (see [`data/dataset/coco_format`](data/dataset/coco_format) for output files
+  * [x] Figure out a common location for all of us to store the dataset, relative to the repo ([`data/dataset`](data/dataset))
 * [ ] YOLOR Architecture (Helen, Aditi)
   * Use a subset of COCO to verify the training code works
   * Where is the code for the YOLOR model architecture? Which component needs to be modified for thermal images?
