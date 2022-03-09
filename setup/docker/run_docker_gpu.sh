@@ -4,7 +4,7 @@ set -e
 # docker names
 DOCKER_REGISTRY=tiffanyyk
 IMAGE_NAME=${DOCKER_REGISTRY}/tiffanyyk
-TAG=rob498-yolor
+TAG=rob #rob498-yolor
 CONTAINER_NAME=default_name
 WORKING_DIR=/data/workspace #${HOME}
 
@@ -23,7 +23,7 @@ NUM_CPUS=8
 INTERACTIVE=1
 GPU_DEVICE=1
 REMOTE=0
-VM_PORT=6000
+VM_PORT=6001
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do

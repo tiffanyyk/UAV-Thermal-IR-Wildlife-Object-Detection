@@ -26,8 +26,8 @@ if __name__ == '__main__':
         video_cnt = 0
         for seq in sorted(seqs):
             # Process Tracking Data
-            # if '.DS_Store' in seq:
-            #     continue
+            if '.DS_Store' in seq:
+                continue
             # if 'mot17' in DATA_PATH and (split != 'test' and not ('FRCNN' in seq)):
             #     continue
             video_cnt += 1
