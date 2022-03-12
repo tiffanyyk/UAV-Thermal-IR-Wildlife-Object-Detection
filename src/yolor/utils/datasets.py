@@ -399,13 +399,16 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         cur_image = self.label_files[0]["image_id"]
 
         label_counter = 0
-        for img_file in data['images']:
+        with_label_images = []
+        for img_index, img_file in enumerate(data['images']):
             img_id = img_file['id']
             if len(self.label_files)<=label_counter:
-                self.labels.append(None)
+                # no_label_images.append(img_index)
+                
+                # self.labels.append(None)
                 continue
             if self.label_files[label_counter]["image_id"] != img_id:
-                self.labels.append(None)
+                # self.labels.append(None)
                 continue
             
             label_accum = None
@@ -423,8 +426,11 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
                     self.label_files[label_counter]['bbox'][1]/518, self.label_files[label_counter]['bbox'][2]/698, self.label_files[label_counter]['bbox'][3]/518]), (1,5))))
                 label_counter += 1
             self.labels.append(label_accum)
-            
-        assert len(self.labels) == len(data['images']), f"dimension mismatch {len(self.labels)}, {len(data['images'])}"
+            with_label_images.append(img_index)
+        
+        # Remove images with no labels
+        self.img_files = [self.img_files[i] for i in with_label_images]
+        assert len(self.labels) == len(self.img_files), f"dimension mismatch {len(self.labels)}, {len(self.img_files)}"
         # for label_file in self.label_files:
         #     if cur_image != label_file["image_id"]:
         #         cur_image = label_file["image_id"]
