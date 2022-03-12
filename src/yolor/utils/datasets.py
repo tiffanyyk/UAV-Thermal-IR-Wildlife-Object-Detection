@@ -393,7 +393,7 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         # Get the list of images and the corresponding annotations
         # Get path root automatically
         path_root, _ = os.path.split(os.path.split(path)[0])
-        self.img_files = [os.path.join(path_root, 'TestReal', 'images', data['images'][i]['file_name']) for i in range(len(data['images']))]
+        self.img_files = [os.path.join(path_root, data['images'][i]['file_name']) for i in range(len(data['images']))]
         self.label_files = data['annotations']
         self.labels = []
         cur_image = self.label_files[0]["image_id"]
