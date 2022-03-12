@@ -60,7 +60,7 @@ def exif_size(img):
 def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=False, cache=False, pad=0.0, rect=False,
                       rank=-1, world_size=1, workers=8):
     # Make sure only the first process in DDP process the dataset first, and the following others can use the cache
-    if 'birdsai' in path:
+    if 'Real' in path:
         with torch_distributed_zero_first(rank):
             dataset = LoadImagesAndLabels_COCO(path, imgsz, batch_size,
                                         augment=augment,  # augment images
@@ -414,16 +414,29 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
             label_accum = None
             while len(self.label_files)>label_counter and self.label_files[label_counter]["image_id"] == img_id:
                 if isinstance(label_accum, type(None)):
-                    label_accum = np.reshape(np.array([self.label_files[label_counter]["category_id"], self.label_files[label_counter]['bbox'][0]/698, 
-                    self.label_files[label_counter]['bbox'][1]/518, self.label_files[label_counter]['bbox'][2]/698, self.label_files[label_counter]['bbox'][3]/518]), (1,5)) # Images are y=518, x=698
+                    label_accum = np.reshape(np.array(
+                        [self.label_files[label_counter]["category_id"],
+                         self.label_files[label_counter]['bbox'][0]/data['images'][img_index]['width'],
+                         self.label_files[label_counter]['bbox'][1]/data['images'][img_index]['height'],
+                         self.label_files[label_counter]['bbox'][2]/data['images'][img_index]['width'],
+                         self.label_files[label_counter]['bbox'][3]/data['images'][img_index]['height']]
+                    ), (1,5)) # Images are y=518, x=698
                     label_counter += 1
                     continue
                 # print(label_accum.shape)
                 # print(np.reshape(np.array([self.label_files[label_counter]["category_id"], 
                 # self.label_files[label_counter]['bbox'][0]/698, 
                 #     self.label_files[label_counter]['bbox'][1]/518, self.label_files[label_counter]['bbox'][2]/698, self.label_files[label_counter]['bbox'][3]/518]), (1,5)))
-                label_accum = np.vstack((label_accum, np.reshape(np.array([self.label_files[label_counter]["category_id"], self.label_files[label_counter]['bbox'][0]/698, 
-                    self.label_files[label_counter]['bbox'][1]/518, self.label_files[label_counter]['bbox'][2]/698, self.label_files[label_counter]['bbox'][3]/518]), (1,5))))
+                label_accum = np.vstack(
+                    (label_accum,
+                     np.reshape(np.array(
+                         [self.label_files[label_counter]["category_id"],
+                          self.label_files[label_counter]['bbox'][0]/data['images'][img_index]['width'],
+                          self.label_files[label_counter]['bbox'][1]/data['images'][img_index]['height'],
+                          self.label_files[label_counter]['bbox'][2]/data['images'][img_index]['width'],
+                          self.label_files[label_counter]['bbox'][3]/data['images'][img_index]['height']]
+                     ), (1,5)))
+                )
                 label_counter += 1
             self.labels.append(label_accum)
             with_label_images.append(img_index)
@@ -431,64 +444,6 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         # Remove images with no labels
         self.img_files = [self.img_files[i] for i in with_label_images]
         assert len(self.labels) == len(self.img_files), f"dimension mismatch {len(self.labels)}, {len(self.img_files)}"
-        # for label_file in self.label_files:
-        #     if cur_image != label_file["image_id"]:
-        #         cur_image = label_file["image_id"]
-        #         self.labels.append(label_accum)
-        #         label_accum = np.reshape(np.array([label_file["category_id"], label_file['bbox'][0]/698, 
-        #         label_file['bbox'][1]/518, label_file['bbox'][2]/698, label_file['bbox'][3]/518]), (1,5)) # Images are y=518, x=698
-        #         continue
-        #     if isinstance(label_accum, type(None)):
-        #         label_accum = np.reshape(np.array([label_file["category_id"], label_file['bbox'][0]/698, 
-        #         label_file['bbox'][1]/518, label_file['bbox'][2]/698, label_file['bbox'][3]/518]), (1,5)) # Images are y=518, x=698
-        #         continue
-
-        #     # print(label_accum.shape)
-        #     # print(np.reshape(np.array([label_file["category_id"], label_file['bbox'][0]/698, 
-        #     #     label_file['bbox'][1]/518, label_file['bbox'][2]/698, label_file['bbox'][3]/518]), (1,5)).shape)
-        #     label_accum = np.vstack((label_accum, np.reshape(np.array([label_file["category_id"], label_file['bbox'][0]/698, 
-        #         label_file['bbox'][1]/518, label_file['bbox'][2]/698, label_file['bbox'][3]/518]), (1,5))))
-        # self.labels.append(label_accum)
-        
-
-        # image_files = []
-
-
-        # try:
-        #     f = []  # image files
-        #     for p in path if isinstance(path, list) else [path]:
-        #         p = Path(p)  # os-agnostic
-        #         if p.is_dir():  # dir
-        #             f += glob.glob(str(p / '**' / '*.*'), recursive=True)
-        #         elif p.is_file():  # file
-        #             with open(p, 'r') as t:
-        #                 t = t.read().splitlines()
-        #                 parent = str(p.parent) + os.sep
-        #                 f += [x.replace('./', parent) if x.startswith('./') else x for x in t]  # local to global path
-        #         else:
-        #             raise Exception('%s does not exist' % p)
-        #     self.img_files = sorted([x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in img_formats])
-        #     assert self.img_files, 'No images found'
-        # except Exception as e:
-        #     raise Exception('Error loading data from %s: %s\nSee %s' % (path, e, help_url))
-
-        # # Check cache
-        # self.label_files = img2label_paths(self.img_files)  # labels
-        # cache_path = str(Path(self.label_files[0]).parent) + '.cache3'  # cached labels
-        # if os.path.isfile(cache_path):
-        #     cache = torch.load(cache_path)  # load
-        #     if cache['hash'] != get_hash(self.label_files + self.img_files):  # dataset changed
-        #         cache = self.cache_labels(cache_path)  # re-cache
-        # else:
-        #     cache = self.cache_labels(cache_path)  # cache
-
-        # Read cache
-        # cache.pop('hash')  # remove hash
-        # labels, shapes = zip(*cache.values())
-        # self.labels = list(labels)
-        # self.shapes = np.array(shapes, dtype=np.float64)
-        # self.img_files = list(cache.keys())  # update
-        # self.label_files = img2label_paths(cache.keys())  # update
 
         # n = len(shapes)  # number of images
         n = len(self.img_files)
@@ -543,7 +498,7 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
             # print(l.shape[0])
             if l is not None and l.shape[0]:
                 assert l.shape[1] == 5, '> 5 label columns: %s' % file
-                assert (l >= 0).all(), 'negative labels: %s' % file
+                # assert (l >= 0).all(), 'negative labels: %s' % file
                 assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s' % file
                 if np.unique(l, axis=0).shape[0] < l.shape[0]:  # duplicate rows
                     nd += 1  # print('WARNING: duplicate rows in %s' % self.label_files[i])  # duplicate rows
