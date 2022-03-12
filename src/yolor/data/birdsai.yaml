@@ -1,10 +1,10 @@
 # train and val datasets (image directory or *.txt file with image paths)
-train: ../birdsai/coco_format/TestReal.json  # 118k images
-val: ../birdsai/coco_format/TestReal.json  # 5k images
-test: ../birdsai/coco_format/TestReal.json  # 20k images for submission to https://competitions.codalab.org/competitions/20794
+train: /birdsai/coco_format/TestReal.json  # 118k images
+val: /birdsai/coco_format/TestReal.json  # 5k images
+test: /birdsai/coco_format/TestReal.json  # 20k images for submission to https://competitions.codalab.org/competitions/20794
 
 # number of classes
-nc: 1
+nc: 2
 
 # class names
-names: ['person']
+names: ['placeholder', 'thing']
