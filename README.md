@@ -43,7 +43,7 @@ ROB498
 ```
 # TODO: Merge yolor docker with repo docker
 
-docker run -ti -v /PATH_TO_DATASET/data/dataset:/birdsai -v /PATH_TO_REPO/ROB498/src/yolor:/yolor --shm-size=64g nvcr.io/nvidia/pytorch:20.11-py3
+docker run -ti -v /PATH_TO_DATASET/data/dataset:/data/workspace/ROB498/data/dataset -v /PATH_TO_REPO/ROB498/src/yolor:/yolor --shm-size=64g nvcr.io/nvidia/pytorch:20.11-py3
 
 python train.py --batch-size 8 --img 1280 1280 --data birdsai.yaml --cfg cfg/yolor_p6.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.1280.yaml --epochs 300
 ```
