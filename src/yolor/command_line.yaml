@@ -1,0 +1,31 @@
+weights: ''
+cfg: cfg/yolor_p6.cfg
+data: birdsai.yaml
+#hyp
+#epochs
+batch-size: 4
+img-size: [640, 640]
+#rect
+#resume
+#nosave
+#notest
+#noautoanchor
+#evolve
+#bucket
+#cache-images
+#image-weights
+device: 0
+#multi-scale
+#single-cls
+#adam
+#sync-bn
+#local_rank
+#log-imgs
+#workers
+#project
+name: yolor_p6
+#exist-ok
+
+# note: the commented out settings will use the defaults.
+
+#--batch-size 8 --img 1280 1280 --data birdsai.yaml --cfg cfg/yolor_p6.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.1280.yaml --epochs 300

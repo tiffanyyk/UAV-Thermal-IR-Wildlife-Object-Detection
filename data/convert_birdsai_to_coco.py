@@ -20,7 +20,7 @@ if __name__ == '__main__':
         out_path = os.path.join(OUT_PATH, '{}.json'.format(split))  # split, "annotations/", '{}.json'.format(split))
         data_path = os.path.join(DATA_PATH, split, "images/")
         out = {'images': [], 'annotations': [],
-               'categories': [{'id': -1, 'name': 'unknown'},
+               'categories': [{'id': 9, 'name': 'unknown'},
                               {'id': 0, 'name': 'human'},
                               {'id': 1, 'name': 'elephant'},
                               {'id': 2, 'name': 'lion'},
@@ -73,12 +73,12 @@ if __name__ == '__main__':
                 print(' {} ann images'.format(int(anns[:, 0].max())))
                 for i in range(anns.shape[0]):
                     frame_id = int(anns[i][0])
-                    if frame_id - 1 < image_range[0] or frame_id - 1> image_range[1]:
+                    if frame_id - 1 < image_range[0] or frame_id - 1 > image_range[1]:
                         continue
                     track_id = int(anns[i][1])
                     cat_id = int(anns[i][7])
                     ann_cnt += 1
-                    category_id = int(anns[i][7])  # birdsai species
+                    category_id = int(anns[i][7]) if int(anns[i][7]) >= 0 else 9  # birdsai species
                     ann = {'id': ann_cnt,
                            'category_id': category_id,
                            'image_id': image_cnt + frame_id,
