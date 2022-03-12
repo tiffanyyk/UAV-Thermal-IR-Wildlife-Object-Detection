@@ -22,7 +22,7 @@ ROB498
     └───docker
         |   Dockerfile, build.sh, run.sh, requirements.txt
 └───data
-    │   convert_mot_to_coco.py
+    │   convert_birdsai_to_coco.py
     └───utils
     └───dataset
         └───TrainReal (put extracted dataset files here)
