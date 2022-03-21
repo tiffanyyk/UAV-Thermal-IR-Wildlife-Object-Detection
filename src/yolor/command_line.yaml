@@ -2,8 +2,8 @@ weights: ''
 cfg: cfg/yolor_p6.cfg
 data: birdsai.yaml
 #hyp
-#epochs
-batch_size: 4
+epochs: 1
+batch_size: 8
 img_size: [640, 640]
 #rect
 #resume
