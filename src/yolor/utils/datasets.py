@@ -58,7 +58,7 @@ def exif_size(img):
 
 
 def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=False, cache=False, pad=0.0, rect=False,
-                      rank=-1, world_size=1, workers=8):
+                      rank=-1, world_size=1, workers=8, channels = 3):
     # Make sure only the first process in DDP process the dataset first, and the following others can use the cache
     if 'Real' in path:
         with torch_distributed_zero_first(rank):
@@ -70,7 +70,7 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
                                         single_cls=opt.single_cls,
                                         stride=int(stride),
                                         pad=pad,
-                                        rank=rank)
+                                        rank=rank, channels = channels)
     else:
         with torch_distributed_zero_first(rank):
             dataset = LoadImagesAndLabels(path, imgsz, batch_size,
@@ -367,7 +367,7 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
     def __init__(self, path, img_size=640, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
-                 cache_images=False, single_cls=False, stride=32, pad=0.0, rank=-1):
+                 cache_images=False, single_cls=False, stride=32, pad=0.0, rank=-1, channels = 3):
         self.img_size = img_size
         self.augment = augment
         self.hyp = hyp
@@ -376,6 +376,7 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         self.mosaic = self.augment and not self.rect  # load 4 images at a time into a mosaic (only during training)
         self.mosaic_border = [-img_size // 2, -img_size // 2]
         self.stride = stride
+        self.channels = channels
 
         # def img2label_paths(img_paths):
         #     # Function for turning image paths to the corresponding label paths
@@ -493,7 +494,6 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         nm, nf, ne, ns, nd = 0, 0, 0, 0, 0  # number missing, found, empty, datasubset, duplicate
         pbar = enumerate(self.label_files)
         
-        print(len(self.img_files))
         if rank in [-1, 0]:
             pbar = tqdm(pbar)
         for i, file in pbar:
@@ -609,13 +609,13 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         mosaic = self.mosaic and random.random() < hyp['mosaic']
         if mosaic:
             # Load mosaic
-            img, labels = load_mosaic(self, index)
+            img, labels = load_mosaic(self, index, channels = self.channels)
             #img, labels = load_mosaic9(self, index)
             shapes = None
 
             # MixUp https://arxiv.org/pdf/1710.09412.pdf
             if random.random() < hyp['mixup']:
-                img2, labels2 = load_mosaic(self, random.randint(0, len(self.labels) - 1))
+                img2, labels2 = load_mosaic(self, random.randint(0, len(self.labels) - 1), channels = self.channels)
                 #img2, labels2 = load_mosaic9(self, random.randint(0, len(self.labels) - 1))
                 r = np.random.beta(8.0, 8.0)  # mixup ratio, alpha=beta=8.0
                 img = (img * r + img2 * (1 - r)).astype(np.uint8)
@@ -623,7 +623,7 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
 
         else:
             # Load image
-            img, (h0, w0), (h, w) = load_image(self, index)
+            img, (h0, w0), (h, w) = load_image(self, index, channels = self.channels)
 
             # Letterbox
             shape = self.batch_shapes[self.batch[index]] if self.rect else self.img_size  # final letterboxed shape
@@ -652,7 +652,8 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
                                                  perspective=hyp['perspective'])
 
             # Augment colorspace
-            augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
+            if self.channels == 3:
+                augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
 
             # Apply cutouts
             # if random.random() < 0.9:
@@ -682,10 +683,12 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
             labels_out[:, 1:] = torch.from_numpy(labels)
 
         # Convert
+        if self.channels == 1:
+            img = np.reshape(img, (img.shape[0], img.shape[1], 1))
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
-
-        return torch.from_numpy(img), labels_out, self.img_files[index], shapes
+        torch_array = torch.from_numpy(img.copy())
+        return torch_array, labels_out, self.img_files[index], shapes
 
     @staticmethod
     def collate_fn(batch):
@@ -1263,18 +1266,28 @@ class LoadImagesAndLabels9(Dataset):  # for training/testing
 
 
 # Ancillary functions --------------------------------------------------------------------------------------------------
-def load_image(self, index):
+def load_image(self, index, channels = 3):
     # loads 1 image from dataset, returns img, original hw, resized hw
     img = self.imgs[index]
     if img is None:  # not cached
         path = self.img_files[index]
-        img = cv2.imread(path)  # BGR
+        if channels == 3:
+            img = cv2.imread(path)  # BGR
+        elif channels == 1:
+            img = cv2.imread(path, 0)
+            img = np.reshape(img, (img.shape[0], img.shape[1], 1))
+            
+        else:
+            raise ValueError(f"Expected channels to be 1 or 3, got {channels}")
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:2]  # orig hw
         r = self.img_size / max(h0, w0)  # resize image to img_size
+        assert len(img.shape) == 3, f'1 image shape not 3D, getting {img.shape}'
         if r != 1:  # always resize down, only resize up if training with augmentation
             interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
             img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
+            img = np.reshape(img, (img.shape[0], img.shape[1],channels))
+        assert len(img.shape) == 3, f'2 image shape not 3D, getting {img.shape}'
         return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
@@ -1299,7 +1312,7 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     #         img[:, :, i] = cv2.equalizeHist(img[:, :, i])
 
 
-def load_mosaic(self, index):
+def load_mosaic(self, index, channels = 3):
     # loads images in a mosaic
 
     labels4 = []
@@ -1308,7 +1321,7 @@ def load_mosaic(self, index):
     indices = [index] + [random.randint(0, len(self.labels) - 1) for _ in range(3)]  # 3 additional image indices
     for i, index in enumerate(indices):
         # Load image
-        img, _, (h, w) = load_image(self, index)
+        img, _, (h, w) = load_image(self, index, channels = channels)
 
         # place img in img4
         if i == 0:  # top left
