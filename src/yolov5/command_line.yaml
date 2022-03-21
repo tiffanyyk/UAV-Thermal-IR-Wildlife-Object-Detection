@@ -1,7 +1,7 @@
 # put any of the argparse options in this file. dashes should be replaced with underscores
 # e.g. --batch-size should be batch_size
 data: birdsai.yaml
-cfg: yolov5n.yaml
+cfg: yolov5n_birdsai.yaml
 weights: ''
 batch_size: 2
 epochs: 1
