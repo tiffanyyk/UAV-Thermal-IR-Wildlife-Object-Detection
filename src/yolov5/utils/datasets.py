@@ -31,6 +31,7 @@ from utils.augmentations import Albumentations, augment_hsv, copy_paste, letterb
 from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, check_dataset, check_requirements, check_yaml, clean_str,
                            segments2boxes, xyn2xy, xywh2xyxy, xywhn2xyxy, xyxy2xywhn)
 from utils.torch_utils import torch_distributed_zero_first
+from src.YOLOR.utils.datasets import LoadImagesAndLabels_COCO
 
 # Parameters
 HELP_URL = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
@@ -98,17 +99,29 @@ def create_dataloader(path, imgsz, batch_size, stride, single_cls=False, hyp=Non
     if rect and shuffle:
         LOGGER.warning('WARNING: --rect is incompatible with DataLoader shuffle, setting shuffle=False')
         shuffle = False
-    with torch_distributed_zero_first(rank):  # init dataset *.cache only once if DDP
-        dataset = LoadImagesAndLabels(path, imgsz, batch_size,
-                                      augment=augment,  # augmentation
-                                      hyp=hyp,  # hyperparameters
-                                      rect=rect,  # rectangular batches
-                                      cache_images=cache,
-                                      single_cls=single_cls,
-                                      stride=int(stride),
-                                      pad=pad,
-                                      image_weights=image_weights,
-                                      prefix=prefix)
+    if 'Real' in path:
+        with torch_distributed_zero_first(rank):
+            dataset = LoadImagesAndLabels_COCO(path, imgsz, batch_size,
+                                        augment=augment,  # augment images
+                                        hyp=hyp,  # augmentation hyperparameters
+                                        rect=rect,  # rectangular training
+                                        cache_images=cache,
+                                        single_cls=single_cls,
+                                        stride=int(stride),
+                                        pad=pad,
+                                        rank=rank)
+    else:
+        with torch_distributed_zero_first(rank):  # init dataset *.cache only once if DDP
+            dataset = LoadImagesAndLabels(path, imgsz, batch_size,
+                                          augment=augment,  # augmentation
+                                          hyp=hyp,  # hyperparameters
+                                          rect=rect,  # rectangular batches
+                                          cache_images=cache,
+                                          single_cls=single_cls,
+                                          stride=int(stride),
+                                          pad=pad,
+                                          image_weights=image_weights,
+                                          prefix=prefix)
 
     batch_size = min(batch_size, len(dataset))
     nd = torch.cuda.device_count()  # number of CUDA devices

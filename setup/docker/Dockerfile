@@ -49,10 +49,6 @@ RUN pip install -r /opt/app/requirements.txt
 # need this for cv2
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 
-## stuff for centernet2  # need to install detectron!
-#RUN pip install omegaconf cloudpickle fvcore
-#RUN git clone https://github.com/facebookresearch/detectron2.git && python -m pip install -e detectron2
-
 RUN apt-get update && apt-get install -y ssh openssh-server net-tools
 
 # add user for given user args
