@@ -85,6 +85,9 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     else:
         model = Darknet(opt.cfg).to(device) # create
 
+    # Get configurations
+    num_channels = model.module_defs_popped['channels']
+
     # Optimizer
     nbs = 64  # nominal batch size
     accumulate = max(round(nbs / total_batch_size), 1)  # accumulate loss before optimizing
@@ -180,7 +183,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
     # Trainloader
     dataloader, dataset = create_dataloader(train_path, imgsz, batch_size, gs, opt,
                                             hyp=hyp, augment=True, cache=opt.cache_images, rect=opt.rect,
-                                            rank=rank, world_size=opt.world_size, workers=opt.workers)
+                                            rank=rank, world_size=opt.world_size, workers=opt.workers, channels = num_channels)
     mlc = np.concatenate(dataset.labels, 0)[:, 0].max()  # max label class
     nb = len(dataloader)  # number of batches
     assert mlc < nc, 'Label class %g exceeds nc=%g in %s. Possible class labels are 0-%g' % (mlc, nc, opt.data, nc - 1)

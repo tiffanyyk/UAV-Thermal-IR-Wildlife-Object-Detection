@@ -36,7 +36,6 @@ def parse_model_cfg(path):
                     mdefs[-1][key] = int(val) if (int(val) - float(val)) == 0 else float(val)
                 else:
                     mdefs[-1][key] = val  # return string
-
     # Check all fields are supported
     supported = ['type', 'batch_normalize', 'filters', 'size', 'stride', 'pad', 'activation', 'layers', 'groups',
                  'from', 'mask', 'anchors', 'classes', 'num', 'jitter', 'ignore_thresh', 'truth_thresh', 'random',
