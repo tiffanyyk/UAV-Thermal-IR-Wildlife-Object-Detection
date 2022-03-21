@@ -485,7 +485,7 @@ if __name__ == '__main__':
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     opt = parser.parse_args()
 
-    if os.environ.get('PYCHARM_HOSTED', '0') == '1':
+    if os.environ.get('PYCHARM_HOSTED','0') == '1':
         # override default args with yaml
         with open('command_line.yaml', 'rb') as f:
             opt_d = vars(opt)

@@ -390,13 +390,18 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         with open(path, 'r') as f:
             data = json.load(f)
 
+        # print(data)
         # Get the list of images and the corresponding annotations
         # Get path root automatically
         path_root, _ = os.path.split(os.path.split(path)[0])
         self.img_files = [os.path.join(path_root, data['images'][i]['file_name']) for i in range(len(data['images']))]
         self.label_files = data['annotations']
         self.labels = []
-        cur_image = self.label_files[0]["image_id"]
+        # print(path)
+        # print(data['annotations'])
+        # print(data.keys())
+        # print(self.label_files)
+        # cur_image = self.label_files[0]["image_id"]
 
         label_counter = 0
         with_label_images = []

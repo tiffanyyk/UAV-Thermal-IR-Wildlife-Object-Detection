@@ -1,0 +1,10 @@
+# train and val datasets (image directory or *.txt file with image paths)
+train: /birdsai/coco_format/TrainReal.json
+val: /birdsai/coco_format/TestReal.json
+test: /birdsai/coco_format/TestReal.json
+
+# number of classes
+nc: 10
+
+# class names
+names: ['human', 'elephant', 'lion', 'giraffe', 'dog', 'crocodile', 'hippo', 'zebra', 'rhino', 'unknown']

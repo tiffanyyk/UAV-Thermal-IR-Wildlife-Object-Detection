@@ -4,7 +4,7 @@ set -e
 # docker names
 DOCKER_REGISTRY=tiffanyyk
 IMAGE_NAME=${DOCKER_REGISTRY}/tiffanyyk
-TAG=rob #rob498-yolor
+TAG=dev2 #rob498-yolor
 CONTAINER_NAME=default_name
 WORKING_DIR=/data/workspace #${HOME}
 
