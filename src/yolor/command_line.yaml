@@ -3,7 +3,7 @@ cfg: cfg/yolor_p6.cfg
 data: birdsai.yaml
 #hyp
 epochs: 1
-batch_size: 8
+batch_size: 2
 img_size: [640, 640]
 #rect
 #resume
@@ -21,7 +21,7 @@ device: 0
 #sync_bn
 #local_rank
 #log_imgs
-#workers
+workers: 0
 #project
 name: yolor_p6
 #exist_ok

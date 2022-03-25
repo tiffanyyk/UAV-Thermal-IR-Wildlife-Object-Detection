@@ -5,3 +5,5 @@ cfg: yolov5n_birdsai.yaml
 weights: ''
 batch_size: 2
 epochs: 1
+device: 0
+workers: 0

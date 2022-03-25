@@ -12,6 +12,7 @@ from pathlib import Path
 from threading import Thread
 
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from PIL import Image, ExifTags
@@ -1273,6 +1274,21 @@ def load_image(self, index, channels = 3):
         path = self.img_files[index]
         if channels == 3:
             img = cv2.imread(path)  # BGR
+            img[..., 0] = cv2.Canny(img, 100, 200)
+            img[..., 2] = cv2.adaptiveThreshold(img[..., 1], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+            # plt.imshow(img)
+            # plt.savefig("/data/workspace/mot/current_img.png")
+            # plt.close()
+            # edge = cv2.Canny(img, 100, 200)  # edge filter
+            # _, fixed = cv2.threshold(img[..., 0], 127, 255, cv2.THRESH_BINARY)  # fixed threshold
+            # blurred = cv2.GaussianBlur(img[..., 0], (7, 7), 0)  # gaussian blur
+            # _, otsu = cv2.threshold(blurred, 0, 255, cv2.THRESH_OTSU)  # otsu filtering
+            # adaptive = cv2.adaptiveThreshold(img[...,0], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+            # for i, (modified_img, name) in enumerate(zip([edge, fixed, otsu, adaptive], ["edge", "fixed", "otsu", "adaptive"])):
+            #     plt.subplot(2, 2, i + 1)
+            #     plt.imshow(modified_img)
+            # plt.savefig(os.path.join("/data/workspace/mot/modified_imgs.png"))
+            # plt.close()
         elif channels == 1:
             img = cv2.imread(path, 0)
             img = np.reshape(img, (img.shape[0], img.shape[1], 1))
