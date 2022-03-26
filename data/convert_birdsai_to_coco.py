@@ -9,7 +9,7 @@ import pdb
 # DATA_PATH = '../../data/mot16/'
 DATA_PATH = '/data/workspace/ROB498/data/dataset/'
 OUT_PATH = '/data/workspace/ROB498/data/dataset/coco_format'
-SPLITS = ["TrainReal", "TestReal"]  # ['train_half', 'val_half', 'train', 'test']
+SPLITS = ["TrainReal", "TestReal", "TrainSimulation"]  # ['train_half', 'val_half', 'train', 'test']
 HALF_VIDEO = True
 CREATE_SPLITTED_ANN = True
 CREATE_SPLITTED_DET = True

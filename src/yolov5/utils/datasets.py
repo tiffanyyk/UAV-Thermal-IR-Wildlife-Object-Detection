@@ -100,7 +100,7 @@ def create_dataloader(path, imgsz, batch_size, stride, single_cls=False, hyp=Non
     if rect and shuffle:
         LOGGER.warning('WARNING: --rect is incompatible with DataLoader shuffle, setting shuffle=False')
         shuffle = False
-    if 'Real' in path:
+    if 'Real' in path or 'Simulation' in path:
         with torch_distributed_zero_first(rank):
             dataset = LoadImagesAndLabels_COCO(path, imgsz, batch_size,
                                         augment=augment,  # augment images
