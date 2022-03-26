@@ -3,7 +3,7 @@ cfg: cfg/yolor_p6.cfg
 data: birdsai.yaml
 #hyp
 epochs: 1
-batch_size: 2
+batch_size: 1
 img_size: [640, 640]
 #rect
 #resume

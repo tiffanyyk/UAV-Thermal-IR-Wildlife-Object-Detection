@@ -11,8 +11,9 @@ from tqdm import tqdm
 
 from utils.google_utils import attempt_load
 from utils.datasets import create_dataloader
+from src.common.general_utils import xywh2xyxy, xyxy2xywh
 from utils.general import coco80_to_coco91_class, check_dataset, check_file, check_img_size, box_iou, \
-    non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, clip_coords, set_logging, increment_path
+    non_max_suppression, scale_coords, clip_coords, set_logging, increment_path
 from utils.loss import compute_loss
 from utils.metrics import ap_per_class
 from utils.plots import plot_images, output_to_target
