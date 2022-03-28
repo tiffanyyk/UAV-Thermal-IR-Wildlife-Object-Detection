@@ -27,11 +27,12 @@ from PIL import ExifTags, Image, ImageOps
 from torch.utils.data import DataLoader, Dataset, dataloader, distributed
 from tqdm import tqdm
 
-from utils.augmentations import Albumentations, augment_hsv, copy_paste, letterbox, mixup, random_perspective
+from utils.augmentations import Albumentations, augment_hsv, copy_paste, mixup, random_perspective
+from src.common.general_utils import xywh2xyxy
 from utils.general import (DATASETS_DIR, LOGGER, NUM_THREADS, check_dataset, check_requirements, check_yaml, clean_str,
-                           segments2boxes, xyn2xy, xywh2xyxy, xywhn2xyxy, xyxy2xywhn)
+                           segments2boxes, xyn2xy, xywhn2xyxy, xyxy2xywhn)
 from utils.torch_utils import torch_distributed_zero_first
-from src.YOLOR.utils.datasets import LoadImagesAndLabels_COCO
+from src.common.data_utils import LoadImagesAndLabels_COCO, letterbox, create_folder
 
 # Parameters
 HELP_URL = 'https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data'
@@ -99,7 +100,7 @@ def create_dataloader(path, imgsz, batch_size, stride, single_cls=False, hyp=Non
     if rect and shuffle:
         LOGGER.warning('WARNING: --rect is incompatible with DataLoader shuffle, setting shuffle=False')
         shuffle = False
-    if 'Real' in path:
+    if 'Real' in path or 'Simulation' in path:
         with torch_distributed_zero_first(rank):
             dataset = LoadImagesAndLabels_COCO(path, imgsz, batch_size,
                                         augment=augment,  # augment images

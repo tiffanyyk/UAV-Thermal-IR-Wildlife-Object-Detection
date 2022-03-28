@@ -25,7 +25,8 @@ import test  # import test.py to get mAP after each epoch
 from models.models import *
 from utils.autoanchor import check_anchors
 from utils.datasets import create_dataloader
-from utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
+from src.common.general_utils import labels_to_image_weights, labels_to_class_weights
+from utils.general import increment_path, init_seeds, \
     fitness, fitness_p, fitness_r, fitness_ap50, fitness_ap, fitness_f, strip_optimizer, get_latest_run,\
     check_dataset, check_file, check_git_status, check_img_size, print_mutation, set_logging
 from utils.google_utils import attempt_download
