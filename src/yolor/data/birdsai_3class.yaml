@@ -1,0 +1,10 @@
+# train and val datasets (image directory or *.txt file with image paths)
+train: /h/helen/datasets/conservation_drones_test_real/coco_format/TrainReal_3class.json
+val: /h/helen/datasets/conservation_drones_test_real/coco_format/TestReal_3class.json
+test: /h/helen/datasets/conservation_drones_test_real/coco_format/TestReal_3class.json
+
+# number of classes
+nc: 3
+
+# class names
+names: ['human', 'elephant', 'unknown']
