@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
 import argparse
 import logging
 import math
@@ -35,6 +37,7 @@ from utils.plots import plot_images, plot_labels, plot_results, plot_evolution
 from utils.torch_utils import ModelEMA, select_device, intersect_dicts, torch_distributed_zero_first
 
 logger = logging.getLogger(__name__)
+
 
 try:
     import wandb
@@ -502,8 +505,8 @@ if __name__ == '__main__':
     opt.world_size = int(os.environ['WORLD_SIZE']) if 'WORLD_SIZE' in os.environ else 1
     opt.global_rank = int(os.environ['RANK']) if 'RANK' in os.environ else -1
     set_logging(opt.global_rank)
-    if opt.global_rank in [-1, 0]:
-        check_git_status()
+    # if opt.global_rank in [-1, 0]:
+    #     check_git_status()
 
     # Resume
     if opt.resume:  # resume an interrupted run
