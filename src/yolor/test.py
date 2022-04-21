@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
+
 import argparse
 import glob
 import json
@@ -310,7 +313,7 @@ if __name__ == '__main__':
     parser.add_argument('--name', default='exp', help='save to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     parser.add_argument('--cfg', type=str, default='cfg/yolor_p6.cfg', help='*.cfg path')
-    parser.add_argument('--names', type=str, default='data/coco.names', help='*.cfg path')
+    parser.add_argument('--names', type=str, default='data/birdsai.names', help='*.cfg path')
     opt = parser.parse_args()
     opt.save_json |= opt.data.endswith('coco.yaml')
     opt.data = check_file(opt.data)  # check file
