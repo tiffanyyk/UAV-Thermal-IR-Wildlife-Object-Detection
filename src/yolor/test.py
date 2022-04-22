@@ -47,7 +47,8 @@ def test(data,
          save_txt=False,  # for auto-labelling
          save_conf=False,
          plots=True,
-         log_imgs=0):  # number of logged images
+         log_imgs=0,
+         channels = 3):  # number of logged images
 
     # Initialize/load model and set device
     training = model is not None
@@ -99,10 +100,10 @@ def test(data,
 
     # Dataloader
     if not training:
-        img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
+        img = torch.zeros((1, channels, imgsz, imgsz), device=device)  # init img
         _ = model(img.half() if half else img) if device.type != 'cpu' else None  # run once
         path = data['test'] if opt.task == 'test' else data['val']  # path to val/test images
-        dataloader = create_dataloader(path, imgsz, batch_size, 64, opt, pad=0.5, rect=True)[0]
+        dataloader = create_dataloader(path, imgsz, batch_size, 64, opt, pad=0.5, rect=True, channels=channels)[0]
 
     seen = 0
     try:
@@ -223,11 +224,12 @@ def test(data,
             stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
 
         # Plot images
-        if plots and batch_i < 3:
+        if plots and (batch_i%50 == 0):
             f = save_dir / f'test_batch{batch_i}_labels.jpg'  # filename
             plot_images(img, targets, paths, f, names)  # labels
             f = save_dir / f'test_batch{batch_i}_pred.jpg'
             plot_images(img, output_to_target(output, width, height), paths, f, names)  # predictions
+            
 
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
@@ -314,6 +316,7 @@ if __name__ == '__main__':
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     parser.add_argument('--cfg', type=str, default='cfg/yolor_p6.cfg', help='*.cfg path')
     parser.add_argument('--names', type=str, default='data/birdsai.names', help='*.cfg path')
+    parser.add_argument('--channels', type=int, default=3, help='Number of channels')
     opt = parser.parse_args()
     opt.save_json |= opt.data.endswith('coco.yaml')
     opt.data = check_file(opt.data)  # check file
@@ -332,6 +335,7 @@ if __name__ == '__main__':
              opt.verbose,
              save_txt=opt.save_txt,
              save_conf=opt.save_conf,
+             channels=opt.channels
              )
 
     elif opt.task == 'study':  # run over a range of settings and save/plot

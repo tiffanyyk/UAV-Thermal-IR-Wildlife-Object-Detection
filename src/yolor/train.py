@@ -197,7 +197,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
         ema.updates = start_epoch * nb // accumulate  # set EMA updates
         testloader = create_dataloader(test_path, imgsz_test, batch_size*2, gs, opt,
                                        hyp=hyp, cache=opt.cache_images and not opt.notest, rect=True,
-                                       rank=-1, world_size=opt.world_size, workers=opt.workers)[0]  # testloader
+                                       rank=-1, world_size=opt.world_size, workers=opt.workers, channels = num_channels)[0]  # testloader
 
         if not opt.resume:
             labels = np.concatenate(dataset.labels, 0)
@@ -348,7 +348,8 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                                                  dataloader=testloader,
                                                  save_dir=save_dir,
                                                  plots=plots and final_epoch,
-                                                 log_imgs=opt.log_imgs if wandb else 0)
+                                                 log_imgs=opt.log_imgs if wandb else 0, 
+                                                 channels = num_channels)
 
             # Write
             with open(results_file, 'a') as f:
