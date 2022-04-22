@@ -83,7 +83,7 @@ if __name__ == '__main__':
                            'category_id': category_id,
                            'image_id': image_cnt + frame_id,
                            'track_id': track_id,
-                           'bbox': anns[i][2:6].tolist(),
+                           'bbox': [int(anns[i][2] + anns[i][4] / 2), int(anns[i][3] + anns[i][5] / 2), int(anns[i][4]), int(anns[i][5])],  # anns[i][2:6].tolist(),
                            'conf': int(1)}  # birdsai doesn't give confidence because boxes are ground truth annotations
                     out['annotations'].append(ann)
             image_cnt += num_images
