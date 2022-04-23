@@ -58,7 +58,7 @@ Running the following command will build a docker image with the image name and 
 $ ./build_docker.sh
 ```
 ### 2. Start a Docker container
-This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) and [`run_docker.sh`](setup/docker/run_docker.sh#l5) accordingly.
+This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) accordingly.
 
 ```
 $ ./run_docker_gpu.sh
@@ -81,7 +81,7 @@ If you encounter any permission errors when building the image or running the do
 $ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
 
 # Testing YOLOR with 2 classes on real data only
-$ python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_p6_val --verbose --names data/birdsai_2class.names
+$ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_p6_val --verbose --names data/birdsai_2class.names
 ```
 </details>
 
