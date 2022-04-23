@@ -1,5 +1,5 @@
 # :elephant: ROB498 - Wildlife Protection Through Aerial Drone Surveillance
-The goal of our project was to build a detection system that can recognize animals in thermal infrared aerial images. We investigated YOLOR and YOLOv5, and performed several experiments on the BIRDSAI dataset before arriving at our final design, shown in the figure below. The final prototype exceeded our design requirement with a ($mAP$) of 38.2\% and is well within the hardware constraints of the GPU assumed to be available on the UAV. More details can be found in our [report](assets/ROB498_Final_Report.pdf).
+The goal of our project was to build a detection system that can recognize animals in thermal infrared aerial images. We investigated YOLOR and YOLOv5, and performed several experiments on the [BIRDSAI](https://sites.google.com/view/elizabethbondi/dataset) dataset before arriving at our final design, shown in the figure below. The final prototype exceeded our design requirement with a mAP of 38.2\% and is well within the hardware constraints of the GPU assumed to be available on the UAV. More details can be found in our [report](assets/ROB498_Final_Report.pdf).
 <p align="center"><img src="assets/design_diagram.png"/></p>
 
 ## :open_file_folder: Repository Structure 
@@ -60,15 +60,9 @@ $ ./build_docker.sh
 ### 2. Start a Docker container
 This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) and [`run_docker.sh`](setup/docker/run_docker.sh#l5) accordingly.
 
-If you have a gpu on your system:
 ```
 $ ./run_docker_gpu.sh
 ```
-If you do not have a gpu:
-```
-$ ./run_docker.sh
-```
-Note that running the code without GPU is not recommended.
 
 ### Remote Debugging
 If this is relevant to you, the [`py_interpreter.sh`](setup/docker/py_interpreter.sh) script is provided for remote debugging setup.
@@ -83,49 +77,44 @@ If you encounter any permission errors when building the image or running the do
 <summary>[Click to view]</summary>
 
 ```
-# Training YOLOR with 3 classes on real data only
-$ python train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
+# Training YOLOR with 2 classes on real data only
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
 
-# Testing YOLOR with 3 classes on real data only
-python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/path/to/saved/checkpoint.pt' --name yolor_p6_val --verbose --names data/birdsai_3class.names
+# Testing YOLOR with 2 classes on real data only
+$ python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_p6_val --verbose --names data/birdsai_2class.names
 ```
 </details>
 
 ## :clock2: Training and Testing YOLOv5
+<details>
+<summary>[Click to view]</summary>
 
-## :clock2: Running YOLOR & YOLOv5
 ```
-# TODO: Merge yolor docker with repo docker
+# Training YOLOv5 with 2 classes on real data only
+$ python train.py --batch 16 --data birdsai_2class.yaml --cfg yolov5n_birdsai_2class.yaml --weights '' --img 640 --device 0
 
-docker run -ti -v /PATH_TO_DATASET/data/dataset/birsai:/birdsai -v /PATH_TO_REPO/ROB498/src/yolor:/yolor --shm-size=64g nvcr.io/nvidia/pytorch:20.11-py3
-
-python train.py --batch-size 16 --img 640 640 --data birdsai_helen.yaml --cfg cfg/yolor_p6_birdsai.cfg --weights 'yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
-
-# Training YOLOR with 3 classes & real data only
-python train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
-
-# Distributed training
-python -m torch.distributed.launch --nproc_per_node 2 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0,1 --sync-bn --name yolor_p6_birdsai --hyp hyp.scratch.640.yaml --epochs 5
-
-
-# Testing YOLOR with 3 classes
-python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_3class_1/weights/last.pt' --name yolor_p6_val --verbose --names data/birdsai_3class.names
-
-python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_3channel_val --verbose --names data/birdsai_2class.names
-
-python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/h/helen/school/ROB498_old/runs/train/yolor_train_3class_32/weights/best_ap50.pt' --name yolor_3class_origanchors_3channel_val --verbose --names data/birdsai_3class.names
-
-python test.py --data birdsai_10class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_10class_1/weights/best_ap50.pt' --name yolor_10class_origanchors_3channel_val --verbose --names data/birdsai.names
-
-
-python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors_1channel.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_1channel_val --verbose --names data/birdsai_2class.names --channels=1
-
-# For plotting stuff for yolor, run in yolor folder
-python test.py --data birdsai_2class.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_3channel_val --verbose --names data/birdsai_2class.names
-
-# For getting inference speed for yolov5, run in yolov5 folder
-python val.py --weights /h/helen/school/ROB498/src/yolov5/runs/train/exp5/weights/best.pt --data birdsai_2class.yaml --img 640 --task speed
+# Testing YOLOv5 with 2 classes on real data only
+$ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task speed
+$ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task test
 ```
+</details>
+
+## Summary of Results
+<details>
+<summary>[Click to view]</summary>
+
+The following table shows the mAP achieved by YOLOR and YOLOv5 for our final experimental configurations.
+| Architecture | mAP<sub>0.5 | mAP<sub>0.5:0.95 |
+|------|------|------|
+| YOLOR | 38.2 | 13.4 |
+| YOLOv5 | 35.4 | 12.7 |
+
+The following table shows the GFLOPs and inference speed on a single P100 GPU for YOLOR and YOLOv5.
+| Architecture | GFLOPs | Inference Time (ms) | NMS (ms) | FPS (total) |
+|------|------|------|------|------|
+| YOLOR | 80.38 | 10.2 | 3.4 | 73.6 |
+| YOLOv5 | 4.2 | 2.5 | 3.9 | 156.3 |
+</details>
 
 ## :relaxed: Acknowledgements
 We would like to thank the authors of [YOLOR](https://github.com/WongKinYiu/yolor) and [YOLOv5](https://github.com/ultralytics/yolov5) for open-sourcing their code.
