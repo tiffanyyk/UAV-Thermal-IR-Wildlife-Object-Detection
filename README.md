@@ -78,7 +78,7 @@ If you encounter any permission errors when building the image or running the do
 
 </details>
 
-## Training and Testing YOLOR
+## :clock2: Training and Testing YOLOR
 <details>
 <summary>[Click to view]</summary>
 
