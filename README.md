@@ -1,8 +1,8 @@
-# ROB498 - Wildlife Protection Through Aerial Drone Surveillance
+# :elephant: ROB498 - Wildlife Protection Through Aerial Drone Surveillance
 The goal of our project was to build a detection system that can recognize animals in thermal infrared aerial images. We investigated YOLOR and YOLOv5, and performed several experiments on the BIRDSAI dataset before arriving at our final design, shown in the figure below. The final prototype exceeded our design requirement with a ($mAP$) of 38.2\% and is well within the hardware constraints of the GPU assumed to be available on the UAV. More details can be found in our [report](assets/ROB498_Final_Report.pdf).
 <p align="center"><img src="assets/design_diagram.png"/></p>
 
-## Repository Structure 
+## :open_file_folder: Repository Structure 
 <details>
 <summary>[Click to view]</summary>
 
@@ -44,7 +44,7 @@ ROB498/
 ```
 </details>
 
-## Environment Setup
+## :hammer: Environment Setup
 <details>
 <summary>[Click to view]</summary>
 To replicate the results in our report, we recommend using the Docker setup provided in this repository. All the relevant files are located in [`setup/docker`](setup/docker). To set this up, do the following:
@@ -91,9 +91,9 @@ python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --io
 ```
 </details>
 
-## Training and Testing YOLOv5
+## :clock2: Training and Testing YOLOv5
 
-## Running YOLOR & YOLOv5
+## :clock2: Running YOLOR & YOLOv5
 ```
 # TODO: Merge yolor docker with repo docker
 
@@ -127,5 +127,5 @@ python test.py --data birdsai_2class.yaml --img 640 --batch 1 --conf 0.001 --iou
 python val.py --weights /h/helen/school/ROB498/src/yolov5/runs/train/exp5/weights/best.pt --data birdsai_2class.yaml --img 640 --task speed
 ```
 
-## Acknowledgements
+## :relaxed: Acknowledgements
 We would like to thank the authors of [YOLOR](https://github.com/WongKinYiu/yolor) and [YOLOv5](https://github.com/ultralytics/yolov5) for open-sourcing their code.
