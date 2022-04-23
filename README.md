@@ -3,7 +3,7 @@ The goal of our project was to build a detection system that can recognize anima
 <p align="center"><img src="assets/design_diagram.png"/></p>
 
 ## :open_file_folder: Repository Structure 
-<details>
+<details open>
 <summary>[Click to view]</summary>
 
 ```
@@ -45,7 +45,7 @@ ROB498/
 </details>
 
 ## :hammer: Environment Setup
-<details>
+<details open>
 <summary>[Click to view]</summary>
 To replicate the results in our report, we recommend using the Docker setup provided in this repository. All the relevant files are located in [`setup/docker`](setup/docker). To set this up, do the following:
 ```
@@ -73,7 +73,7 @@ If you encounter any permission errors when building the image or running the do
 </details>
 
 ## :clock2: Training and Testing YOLOR
-<details>
+<details open>
 <summary>[Click to view]</summary>
 
 ```
@@ -86,7 +86,7 @@ $ python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --
 </details>
 
 ## :clock2: Training and Testing YOLOv5
-<details>
+<details open>
 <summary>[Click to view]</summary>
 
 ```
@@ -100,7 +100,7 @@ $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yam
 </details>
 
 ## :clipboard: Summary of Results
-<details>
+<details open>
 <summary>[Click to view]</summary>
 
 The following table shows the mAP achieved by YOLOR and YOLOv5 for our final experimental configurations.
