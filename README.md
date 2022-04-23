@@ -157,6 +157,8 @@ ROB498/
     └───yolov5/
         └───data/
             |   birdsai_2class.yaml
+        └───models/
+            |   yolov5n_birdsai_2class.yaml
 ```
 
 All commands should follow this format for training and testing on YOLOR:
