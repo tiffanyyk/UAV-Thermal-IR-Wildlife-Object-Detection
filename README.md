@@ -99,7 +99,7 @@ $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yam
 ```
 </details>
 
-## Summary of Results
+## :clipboard: Summary of Results
 <details>
 <summary>[Click to view]</summary>
 
