@@ -1,44 +1,79 @@
 # ROB498
-## TODOs
-* [ ] Setup VSCode with Google Colab - how / what link to follow? (Helen, Aditi)
-* [x] Docker scripts (Tiffany)
-* [x] Dataset conversion from BIRDSAI to COCO (Isobel, Tiffany)
-  * [x] What is the original width, height, number of channels of the thermal images? (698, 520), (698, 519), (640, 512) **we'll need resizing code**
-  * [x] Use a subset of BIRDSAI and run `convert_mot_to_coco.py` on it to verify the script works (see [`data/dataset/coco_format`](data/dataset/coco_format) for output files
-  * [x] Figure out a common location for all of us to store the dataset, relative to the repo ([`data/dataset`](data/dataset))
-* [ ] YOLOR Architecture (Helen, Aditi)
-  * Use a subset of COCO to verify the training code works
-  * Where is the code for the YOLOR model architecture? Which component needs to be modified for thermal images?
-  * How do we run training / pass in configs & hyperparameters?
-* [ ] CenterNet2
+
+
 ## Repo Structure 
 Rough repository structure we can follow as we build our project
 ```
-ROB498
+ROB498/
 │   README.md
 |   .gitignore
 |   LICENSE
-└───setup
-    └───docker
-        |   Dockerfile, build.sh, run.sh, requirements.txt
-└───data
-    │   convert_birdsai_to_coco.py
-    └───utils
-    └───dataset
-        └───TrainReal (put extracted dataset files here)
-        └───TestReal (put extracted dataset files here)
-        └───coco_format (output from `convert_mot_to_coco.py`)
+└───setup/
+    └───docker/
+        |   Dockerfile, build_docker.sh, run_docker_gpu.sh, run_docker.sh, py_interpreter.sh
+└───data/
+    │   convert_birdsai_to_coco.py -- script to convert BIRDSAI dataset to COCO format
+    |   count_classes.py -- script to determine the number of samples in each object class
+    |   Anchor_Statistics.ipynb -- K-means to determine anchors for YOLOR
+    └───utils/ -- folder containing code for BIRDSAI data handling which we didn't use
+    └───dataset/ (store dataset files here)
+        └───TrainReal/
+            └───annotations/
+            └───images/
+        └───TestReal/
+            └───annotations/
+            └───images/
+        └───TrainSimulation/
+            └───annotations/
+            └───images/
+        └───coco_format/ (data/convert_birdsai_to_coco.py will save outputs to this directory)
             |   TrainReal.json
             |   TestReal.json
-└───src (will likely end up with subfolders)
-    └───yolor
-        |   all the folders from the yolor repo copied into here
-    └───centernet2
-        |   all the folders from the centernet repo copied into here
-└───tools (TBD)
-    |   experiment script (i.e. script that starts the training / testing run)
-    |   config files (configs for the train / test run)
+            |   TrainSimulation.json
+└───src/
+    └───common/
+        |   data_utils.py -- data-related utility functions shared between models
+        |   general_utils.py -- general utility functions shared between models
+    └───yolor/
+        |   YOLOR specific code lives in this directory
+    └───yolov5/
+        |   YOLOv5 specific code lives in this directory
 ```
+
+## Environment Setup
+<details>
+<summary>[Click to view]</summary>
+To replicate the results in our report, we recommend using the Docker setup provided in this repository. All the relevant files are located in [`setup/docker`](setup/docker). To set this up, do the following:
+```
+$ cd setup/docker
+```
+
+### 1. Build the Docker image
+Running the following command will build a docker image with the image name and tag specified in lines 4-5 of [`build_docker.sh`](setup/docker/build_docker.sh#l4). Modify this according to your preference. The default is currently set to `tiffanyyk/tiffanyyk:rob498-yolo`.
+```
+$ ./build_docker.sh
+```
+### 2. Start a Docker container
+This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) and [`run_docker.sh`](setup/docker/run_docker.sh#l5) accordingly.
+
+If you have a gpu on your system:
+```
+$ ./run_docker_gpu.sh
+```
+If you do not have a gpu:
+```
+$ ./run_docker.sh
+```
+Note that running the code without GPU is not recommended.
+
+### Remote Debugging
+If this is relevant to you, the [`py_interpreter.sh`](setup/docker/py_interpreter.sh) script is provided for remote debugging setup.
+
+### Setup Notes
+If you encounter any permission errors when building the image or running the docker container, use `chmod +x [build or run script]`.
+
+</details>
+
 ## Running YOLOR
 ```
 # TODO: Merge yolor docker with repo docker

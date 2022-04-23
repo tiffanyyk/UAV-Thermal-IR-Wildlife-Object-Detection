@@ -5,11 +5,10 @@ from PIL import Image
 import cv2
 import pdb
 
-# Use the same script for MOT16
-# DATA_PATH = '../../data/mot16/'
+
 DATA_PATH = '/data/workspace/ROB498/data/dataset/'
 OUT_PATH = '/data/workspace/ROB498/data/dataset/coco_format'
-SPLITS = ["TrainReal", "TestReal", "TrainSimulation"]  # ['train_half', 'val_half', 'train', 'test']
+SPLITS = ["TrainReal", "TestReal", "TrainSimulation"]
 HALF_VIDEO = True
 CREATE_SPLITTED_ANN = True
 CREATE_SPLITTED_DET = True
@@ -17,7 +16,7 @@ CREATE_SPLITTED_DET = True
 
 if __name__ == '__main__':
     for split in SPLITS:
-        out_path = os.path.join(OUT_PATH, '{}.json'.format(split))  # split, "annotations/", '{}.json'.format(split))
+        out_path = os.path.join(OUT_PATH, '{}.json'.format(split))
         data_path = os.path.join(DATA_PATH, split, "images/")
         out = {'images': [], 'annotations': [],
                'categories': [{'id': 9, 'name': 'unknown'},
@@ -45,7 +44,7 @@ if __name__ == '__main__':
                 'file_name': seq})
             seq_path = '{}/{}/'.format(data_path, seq)
             ann_path = os.path.join(data_path, "..", "annotations", f"{seq}.csv")  # seq_path + 'gt/gt.txt'
-            images = os.listdir(seq_path)  # os.listdir(img_path)
+            images = os.listdir(seq_path)
             num_images = len([image for image in images if 'jpg' in image])
             image_range = [0, num_images - 1]  # note that image numbering doesn't always start at 0
             for i, file_int in enumerate(sorted([int(image[-14:-4]) for image in images if 'jpg' in image])):
@@ -84,7 +83,7 @@ if __name__ == '__main__':
                            'image_id': image_cnt + frame_id,
                            'track_id': track_id,
                            'bbox': [int(anns[i][2] + anns[i][4] / 2), int(anns[i][3] + anns[i][5] / 2), int(anns[i][4]), int(anns[i][5])],  # anns[i][2:6].tolist(),
-                           'conf': int(1)}  # birdsai doesn't give confidence because boxes are ground truth annotations
+                           'conf': int(1)}
                     out['annotations'].append(ann)
             image_cnt += num_images
         print('loaded {} for {} images and {} samples'.format(
