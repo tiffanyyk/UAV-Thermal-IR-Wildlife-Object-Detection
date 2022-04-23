@@ -63,6 +63,10 @@ This will start a docker container using the image you have just built. If you c
 ```
 $ ./run_docker_gpu.sh
 ```
+If you have multiple GPUs (e.g. 4 GPUs), run the following instead:
+```
+$ ./run_docker_gpu.sh -gd 0,1,2,3
+```
 
 ### Remote Debugging
 If this is relevant to you, the [`py_interpreter.sh`](setup/docker/py_interpreter.sh) script is provided for remote debugging setup.
