@@ -1,8 +1,11 @@
-# ROB498
+# ROB498 - Wildlife Protection Through Aerial Drone Surveillance
+The goal of our project was to build a detection system that can recognize animals in thermal infrared aerial images. We investigated YOLOR and YOLOv5, and performed several experiments on the BIRDSAI dataset before arriving at our final design, shown in the figure below. The final prototype exceeded our design requirement with a ($mAP$) of 38.2\% and is well within the hardware constraints of the GPU assumed to be available on the UAV. More details can be found in our [report](assets/ROB498_Final_Report.pdf).
+<p align="center"><img src="assets/design_diagram.png"/></p>
 
+## Repository Structure 
+<details>
+<summary>[Click to view]</summary>
 
-## Repo Structure 
-Rough repository structure we can follow as we build our project
 ```
 ROB498/
 │   README.md
@@ -39,6 +42,7 @@ ROB498/
     └───yolov5/
         |   YOLOv5 specific code lives in this directory
 ```
+</details>
 
 ## Environment Setup
 <details>
@@ -74,14 +78,20 @@ If you encounter any permission errors when building the image or running the do
 
 </details>
 
-## Running YOLOR
-```
-# TODO: Merge yolor docker with repo docker
+## Training and Testing YOLOR
+<details>
+<summary>[Click to view]</summary>
 
-docker run -ti -v /PATH_TO_DATASET/data/dataset/birsai:/birdsai -v /PATH_TO_REPO/ROB498/src/yolor:/yolor --shm-size=64g nvcr.io/nvidia/pytorch:20.11-py3
-
-python train.py --batch-size 16 --img 640 640 --data birdsai_helen.yaml --cfg cfg/yolor_p6_birdsai.cfg --weights 'yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
 ```
+# Training YOLOR with 3 classes on real data only
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
+
+# Testing YOLOR with 3 classes on real data only
+python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/path/to/saved/checkpoint.pt' --name yolor_p6_val --verbose --names data/birdsai_3class.names
+```
+</details>
+
+## Training and Testing YOLOv5
 
 ## Running YOLOR & YOLOv5
 ```
@@ -117,3 +127,5 @@ python test.py --data birdsai_2class.yaml --img 640 --batch 1 --conf 0.001 --iou
 python val.py --weights /h/helen/school/ROB498/src/yolov5/runs/train/exp5/weights/best.pt --data birdsai_2class.yaml --img 640 --task speed
 ```
 
+## Acknowledgements
+We would like to thank the authors of [YOLOR](https://github.com/WongKinYiu/yolor) and [YOLOv5](https://github.com/ultralytics/yolov5) for open-sourcing their code.
