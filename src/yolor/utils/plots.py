@@ -170,8 +170,8 @@ def plot_images(images, targets, paths=None, fname='images.jpg', names=None, max
         # Draw image filename labels
         if paths:
             label = Path(paths[i]).name[:40]  # trim to 40 char
-            t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
-            cv2.putText(mosaic, label, (block_x + 5, block_y + t_size[1] + 5), 0, tl / 3, [220, 220, 220], thickness=tf,
+            t_size = cv2.getTextSize(label, 0, fontScale=tl / 2, thickness=tf)[0]
+            cv2.putText(mosaic, label, (block_x + 5, block_y + t_size[1] + 5), 0, tl / 6, [220, 220, 220], thickness=tf,
                         lineType=cv2.LINE_AA)
 
         # Image border
