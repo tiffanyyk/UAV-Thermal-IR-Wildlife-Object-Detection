@@ -78,11 +78,18 @@ If you encounter any permission errors when building the image or running the do
 
 ```
 # Training YOLOR with 2 classes on real data only
-$ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
+$ cd /path/to/repo/ROB498/src/yolor
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0 --name yolor_final_prototype --hyp hyp.scratch.640.yaml --epochs 200
 
 # Testing YOLOR with 2 classes on real data only
-$ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_p6_val --verbose --names data/birdsai_2class.names
+$ cd /path/to/repo/ROB498/src/yolor
+$ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_final_prototype_test --verbose --names data/birdsai_2class.names
+
+# Training YOLOR with 2 classes on real data only (Multi-GPU)
+$ cd /path/to/repo/ROB498/src/yolor
+$ python -m torch.distributed.launch --nproc_per_node 4 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0,1,2,3 --sync-bn --name "name_of_project" --hyp hyp.scratch.640.yaml --epochs 200
 ```
+
 </details>
 
 ## :clock2: Training and Testing YOLOv5
@@ -91,9 +98,11 @@ $ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --
 
 ```
 # Training YOLOv5 with 2 classes on real data only
+$ cd /path/to/repo/ROB498/src/yolov5
 $ python train.py --batch 16 --data birdsai_2class.yaml --cfg yolov5n_birdsai_2class.yaml --weights '' --img 640 --device 0
 
 # Testing YOLOv5 with 2 classes on real data only
+$ cd /path/to/repo/ROB498/src/yolov5
 $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task speed
 $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task test
 ```
@@ -114,6 +123,49 @@ The following table shows the GFLOPs and inference speed on a single P100 GPU fo
 |------|------|------|------|------|
 | YOLOR | 80.38 | 10.2 | 3.4 | 73.6 |
 | YOLOv5 | 4.2 | 2.5 | 3.9 | 156.3 |
+</details>
+
+## :clipboard: Other Possible Configurations Provided
+<details close>
+<summary>[Click to view]</summary>
+We provide an assortment of other possible configurations, for running experiments with different number of classes and reproducing results indicated in the report.
+
+All configuration files are provided in the following locations:
+```
+ROB498/
+└───src/
+    └───yolor/
+        └───cfg/
+            |   yolor_p6_birdsai_2class_origanchors.cfg
+            |   yolor_p6_birdsai_2class_origanchors_1channel.cfg
+            |   yolor_p6_birdsai_3class.cfg
+            |   yolor_p6_birdsai.cfg
+        └───data/
+            |   birdsai_2class.names
+            |   birdsai_2class.yaml
+            |   birdsai_3class.names
+            |   birdsai_3class.yaml
+            |   birdsai.names
+            |   birdsai_10class.yaml
+            |   hyp.finetune.1280
+            |   hyp.scratch.1280
+            |   hyp.scratch.640
+    └───yolov5/
+        └───data/
+            |   birdsai_2class.yaml
+```
+
+All commands should follow this format for training and testing on YOLOR:
+```
+# Training YOLOR with 2 classes on real data only
+$ cd /path/to/repo/ROB498/src/yolor
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_{X}class.yaml --cfg cfg/yolor_p6_birdsai_{X}.cfg --weights '' --device 0 --name {NAME_OF_EXPERIMENT} --hyp hyp.{X}.yaml --epochs 200
+
+# Testing YOLOR with 2 classes on real data only
+$ cd /path/to/repo/ROB498/src/yolor
+$ python test.py --data birdsai_{X}class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_{X}.cfg --weights /path/to/saved/checkpoint.pt --name {NAME_OF_EXPERIMENT} --verbose --names data/birdsai{X}.names
+```
+
 </details>
 
 ## :relaxed: Acknowledgements
