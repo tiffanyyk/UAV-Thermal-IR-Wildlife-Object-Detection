@@ -47,3 +47,38 @@ docker run -ti -v /PATH_TO_DATASET/data/dataset/birsai:/birdsai -v /PATH_TO_REPO
 
 python train.py --batch-size 16 --img 640 640 --data birdsai_helen.yaml --cfg cfg/yolor_p6_birdsai.cfg --weights 'yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
 ```
+
+## Running YOLOR & YOLOv5
+```
+# TODO: Merge yolor docker with repo docker
+
+docker run -ti -v /PATH_TO_DATASET/data/dataset/birsai:/birdsai -v /PATH_TO_REPO/ROB498/src/yolor:/yolor --shm-size=64g nvcr.io/nvidia/pytorch:20.11-py3
+
+python train.py --batch-size 16 --img 640 640 --data birdsai_helen.yaml --cfg cfg/yolor_p6_birdsai.cfg --weights 'yolor_p6.pt' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
+
+# Training YOLOR with 3 classes & real data only
+python train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0 --name yolor_p6 --hyp hyp.scratch.640.yaml --epochs 100
+
+# Distributed training
+python -m torch.distributed.launch --nproc_per_node 2 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_3class.yaml --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '' --device 0,1 --sync-bn --name yolor_p6_birdsai --hyp hyp.scratch.640.yaml --epochs 5
+
+
+# Testing YOLOR with 3 classes
+python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_3class_1/weights/last.pt' --name yolor_p6_val --verbose --names data/birdsai_3class.names
+
+python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_3channel_val --verbose --names data/birdsai_2class.names
+
+python test.py --data birdsai_3class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_3class.cfg --weights '/h/helen/school/ROB498_old/runs/train/yolor_train_3class_32/weights/best_ap50.pt' --name yolor_3class_origanchors_3channel_val --verbose --names data/birdsai_3class.names
+
+python test.py --data birdsai_10class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_10class_1/weights/best_ap50.pt' --name yolor_10class_origanchors_3channel_val --verbose --names data/birdsai.names
+
+
+python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors_1channel.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_1channel_val --verbose --names data/birdsai_2class.names --channels=1
+
+# For plotting stuff for yolor, run in yolor folder
+python test.py --data birdsai_2class.yaml --img 640 --batch 1 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '/h/helen/school/ROB498/runs/train/yolor_train_2class_12/weights/best_ap50.pt' --name yolor_2class_origanchors_3channel_val --verbose --names data/birdsai_2class.names
+
+# For getting inference speed for yolov5, run in yolov5 folder
+python val.py --weights /h/helen/school/ROB498/src/yolov5/runs/train/exp5/weights/best.pt --data birdsai_2class.yaml --img 640 --task speed
+```
+
