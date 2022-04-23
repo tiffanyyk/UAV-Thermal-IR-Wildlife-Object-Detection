@@ -17,11 +17,12 @@ Usage - formats:
                                       yolov5s.tflite             # TensorFlow Lite
                                       yolov5s_edgetpu.tflite     # TensorFlow Edge TPU
 """
+import sys
+sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
 
 import argparse
 import json
 import os
-import sys
 from pathlib import Path
 from threading import Thread
 

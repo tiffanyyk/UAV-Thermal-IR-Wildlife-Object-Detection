@@ -11,6 +11,8 @@ Usage:
     $ python path/to/train.py --data coco128.yaml --weights yolov5s.pt --img 640  # from pretrained (RECOMMENDED)
     $ python path/to/train.py --data coco128.yaml --weights '' --cfg yolov5s.yaml --img 640  # from scratch
 """
+import sys
+sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
 
 import argparse
 import math
@@ -358,7 +360,6 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 if callbacks.stop_training:
                     return
             # end batch ------------------------------------------------------------------------------------------------
-
         # Scheduler
         lr = [x['lr'] for x in optimizer.param_groups]  # for loggers
         scheduler.step()
