@@ -17,76 +17,69 @@ from PIL import Image, ExifTags
 from torch.utils.data import Dataset
 from tqdm import tqdm
 from src.common.general_utils import xyxy2xywh, xywh2xyxy
+import json
 
 
 class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
     def __init__(self, path, img_size=640, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
                  cache_images=False, single_cls=False, stride=32, pad=0.0, rank=-1, channels=3):
-        self.img_size = img_size
-        self.augment = augment
-        self.hyp = hyp
-        self.image_weights = image_weights
-        self.rect = False if image_weights else rect
-        self.mosaic = self.augment and not self.rect  # load 4 images at a time into a mosaic (only during training)
-        self.mosaic_border = [-img_size // 2, -img_size // 2]
+        self.img_size = img_size # Image size to resize loaded images
+        self.augment = augment # Whether to add rescaling / hsv augmentations
+        self.hyp = hyp # Hyperparameters for augmentation
+        self.image_weights = image_weights 
+        self.rect = False if image_weights else rect # Rectangular training
+        self.mosaic = self.augment and not self.rect  # Load 4 images at a time into a mosaic (only during training)
+        self.mosaic_border = [-img_size // 2, -img_size // 2] # Edges for mosaic
         self.stride = stride
-        self.channels = channels
-
-        # def img2label_paths(img_paths):
-        #     # Function for turning image paths to the corresponding label paths
-
-        #     # Define label paths as a function of image paths
-        #     sa, sb = os.sep + 'images' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
-        #     return [x.replace(sa, sb, 1).replace(x.split('.')[-1], 'txt') for x in img_paths]
+        self.channels = channels # Number of channels
 
         # Read the annotation file and get the image paths
-        import json
-
         with open(path, 'r') as f:
             data = json.load(f)
 
-        # print(data)
         # Get the list of images and the corresponding annotations
         # Get path root automatically
         path_root, _ = os.path.split(os.path.split(path)[0])
         self.img_files = [os.path.join(path_root, data['images'][i]['file_name']) for i in range(len(data['images']))]
         self.label_files = data['annotations']
         self.labels = []
-        # print(path)
-        # print(data['annotations'])
-        # print(data.keys())
-        # print(self.label_files)
-        # cur_image = self.label_files[0]["image_id"]
 
+        # Associate labels with images
         label_counter = 0
         with_label_images = []
+
+        # Loop through image files, associate images with labels
         for img_index, img_file in enumerate(data['images']):
             img_id = img_file['id']
+            
             if len(self.label_files) <= label_counter:
-                # no_label_images.append(img_index)
-
-                # self.labels.append(None)
                 continue
+            
+            # Skip images where there is no label
             if self.label_files[label_counter]["image_id"] != img_id:
-                # self.labels.append(None)
                 continue
-
+            
             label_accum = None
+            # Associate images with labels
             while len(self.label_files) > label_counter and self.label_files[label_counter]["image_id"] == img_id:
+
+                # If we are getting the first label
                 if isinstance(label_accum, type(None)):
+
+                    # Normalize the labels
                     label_accum = np.reshape(np.array(
                         [self.label_files[label_counter]["category_id"],
                          self.label_files[label_counter]['bbox'][0] / data['images'][img_index]['width'],
                          self.label_files[label_counter]['bbox'][1] / data['images'][img_index]['height'],
                          self.label_files[label_counter]['bbox'][2] / data['images'][img_index]['width'],
                          self.label_files[label_counter]['bbox'][3] / data['images'][img_index]['height']]
-                    ), (1, 5))  # Images are y=518, x=698
+                    ), (1, 5))
+
+                    # Count the total number of labels
                     label_counter += 1
                     continue
-                # print(label_accum.shape)
-                # print(np.reshape(np.array([self.label_files[label_counter]["category_id"],
-                # self.label_files[label_counter]['bbox'][0]/698,
-                #     self.label_files[label_counter]['bbox'][1]/518, self.label_files[label_counter]['bbox'][2]/698, self.label_files[label_counter]['bbox'][3]/518]), (1,5)))
+                
+                # Stack labels together
                 label_accum = np.vstack(
                     (label_accum,
                      np.reshape(np.array(
@@ -97,67 +90,52 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
                           self.label_files[label_counter]['bbox'][3] / data['images'][img_index]['height']]
                      ), (1, 5)))
                 )
+
+                # Count labels
                 label_counter += 1
+
+            # Append array of labels for one image into labels
             self.labels.append(label_accum)
+
+            # Append the corresponding image index
             with_label_images.append(img_index)
 
         # Remove images with no labels
         self.img_files = [self.img_files[i] for i in with_label_images]
+
+        # Assert the labels is equal to number of images
         assert len(self.labels) == len(self.img_files), f"dimension mismatch {len(self.labels)}, {len(self.img_files)}"
 
-        # n = len(shapes)  # number of images
+        # Number of images
         n = len(self.img_files)
-        self.shapes = np.repeat(
-            np.reshape(np.array([518, 698]), (1, 2)),
-            n,
-            axis=0
-        )
-        bi = np.floor(np.arange(n) / batch_size).astype(np.int)  # batch index
-        nb = bi[-1] + 1  # number of batches
-        self.batch = bi  # batch index of image
         self.n = n
+        
+        # Batch index for images
+        bi = np.floor(np.arange(n) / batch_size).astype(np.int)  
+        self.batch = bi
 
-        # Rectangular Training
-        if self.rect:
-            # Sort by aspect ratio
-            s = self.shapes  # wh
-            ar = s[:, 1] / s[:, 0]  # aspect ratio
-            irect = ar.argsort()
-            self.img_files = [self.img_files[i] for i in irect]
+        # Number of batches
+        nb = bi[-1] + 1
 
-            # self.label_files = [self.label_files[i] for i in irect]
-            self.labels = [self.labels[i] for i in irect]
-            self.shapes = s[irect]  # wh
-            ar = ar[irect]
-
-            # Set training image shapes
-            shapes = [[1, 1]] * nb
-            for i in range(nb):
-                ari = ar[bi == i]
-                mini, maxi = ari.min(), ari.max()
-                if maxi < 1:
-                    shapes[i] = [maxi, 1]
-                elif mini > 1:
-                    shapes[i] = [1, 1 / mini]
-
-            self.batch_shapes = np.ceil(np.array(shapes) * img_size / stride + pad).astype(np.int) * stride
-
-        # Check labels
-        self.label_files = self.img_files  # hack; to fix later
-        create_datasubset, extract_bounding_boxes, labels_loaded = False, False, False
-        nm, nf, ne, ns, nd = 0, 0, 0, 0, 0  # number missing, found, empty, datasubset, duplicate
-        pbar = enumerate(self.label_files)
-
+        self.label_files = self.img_files  # Label files correspond to image files 
+        nm, nf, ne, ns, nd = 0, 0, 0, 0, 0  # Number missing, found, empty, datasubset, duplicate
+        pbar = enumerate(self.label_files) # 
+        
+        # For multi-gpu training
         if rank in [-1, 0]:
             pbar = tqdm(pbar)
+        
+        # Iterate through files in pbar
         for i, file in pbar:
-            # print(i)
-            l = self.labels[i]  # label
-            # print(l)
-            # print(l.shape[0])
+
+            # Get the label
+            l = self.labels[i]
+
+            # If label exists
             if l is not None and l.shape[0]:
+
+                # Make sure label format is correct
                 assert l.shape[1] == 5, '> 5 label columns: %s' % file
-                # assert (l >= 0).all(), 'negative labels: %s' % file
                 assert (l[:, 1:] <= 1).all(), 'non-normalized or out of bounds coordinate labels: %s' % file
                 if np.unique(l, axis=0).shape[0] < l.shape[0]:  # duplicate rows
                     nd += 1  # print('WARNING: duplicate rows in %s' % self.label_files[i])  # duplicate rows
@@ -166,43 +144,10 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
                 self.labels[i] = l
                 nf += 1  # file found
 
-                # Create subdataset (a smaller dataset)
-                if create_datasubset and ns < 1E4:
-                    if ns == 0:
-                        create_folder(path='./datasubset')
-                        os.makedirs('./datasubset/images')
-                    exclude_classes = 43
-                    if exclude_classes not in l[:, 0]:
-                        ns += 1
-                        # shutil.copy(src=self.img_files[i], dst='./datasubset/images/')  # copy image
-                        with open('./datasubset/images.txt', 'a') as f:
-                            f.write(self.img_files[i] + '\n')
-
-                # Extract object detection boxes for a second stage classifier
-                if extract_bounding_boxes:
-                    p = Path(self.img_files[i])
-                    img = cv2.imread(str(p))
-                    h, w = img.shape[:2]
-                    for j, x in enumerate(l):
-                        f = '%s%sclassifier%s%g_%g_%s' % (p.parent.parent, os.sep, os.sep, x[0], j, p.name)
-                        if not os.path.exists(Path(f).parent):
-                            os.makedirs(Path(f).parent)  # make new output folder
-
-                        b = x[1:] * [w, h, w, h]  # box
-                        b[2:] = b[2:].max()  # rectangle to square
-                        b[2:] = b[2:] * 1.3 + 30  # pad
-                        b = xywh2xyxy(b.reshape(-1, 4)).ravel().astype(np.int)
-
-                        b[[0, 2]] = np.clip(b[[0, 2]], 0, w)  # clip boxes outside of image
-                        b[[1, 3]] = np.clip(b[[1, 3]], 0, h)
-                        assert cv2.imwrite(f, img[b[1]:b[3], b[0]:b[2]]), 'Failure extracting classifier boxes'
             else:
-                ne += 1  # print('empty labels for image %s' % self.img_files[i])  # file empty
-                # os.system("rm '%s' '%s'" % (self.img_files[i], self.label_files[i]))  # remove
+                ne += 1  # Empty
 
             if rank in [-1, 0]:
-                # pbar.desc = 'Scanning labels %s (%g found, %g missing, %g empty, %g duplicate, for %g images)' % (
-                #     cache_path, nf, nm, ne, nd, n)
                 pbar.desc = 'Scanning labels (%g found, %g missing, %g empty, %g duplicate, for %g images)' % (
                     nf, nm, ne, nd, n)
         if nf == 0:
@@ -212,65 +157,26 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
 
         # Cache images into memory for faster training (WARNING: large datasets may exceed system RAM)
         self.imgs = [None] * n
-        if cache_images:
-            gb = 0  # Gigabytes of cached images
-            self.img_hw0, self.img_hw = [None] * n, [None] * n
-            results = ThreadPool(8).imap(lambda x: load_image(*x), zip(repeat(self), range(n)))  # 8 threads
-            pbar = tqdm(enumerate(results), total=n)
-            for i, x in pbar:
-                self.imgs[i], self.img_hw0[i], self.img_hw[i] = x  # img, hw_original, hw_resized = load_image(self, i)
-                gb += self.imgs[i].nbytes
-                pbar.desc = 'Caching images (%.1fGB)' % (gb / 1E9)
-
-    def cache_labels(self, path='labels.cache3'):
-        # Cache dataset labels, check images and read shapes
-        x = {}  # dict
-        pbar = tqdm(zip(self.img_files, self.label_files), desc='Scanning images', total=len(self.img_files))
-        for (img, label) in pbar:
-            try:
-                l = []
-                im = Image.open(img)
-                im.verify()  # PIL verify
-                shape = exif_size(im)  # image size
-                assert (shape[0] > 9) & (shape[1] > 9), 'image size <10 pixels'
-                if os.path.isfile(label):
-                    with open(label, 'r') as f:
-                        l = np.array([x.split() for x in f.read().splitlines()], dtype=np.float32)  # labels
-                if len(l) == 0:
-                    l = np.zeros((0, 5), dtype=np.float32)
-                x[img] = [l, shape]
-            except Exception as e:
-                print('WARNING: Ignoring corrupted image and/or label %s: %s' % (img, e))
-
-        x['hash'] = get_hash(self.label_files + self.img_files)
-        torch.save(x, path)  # save for next time
-        return x
 
     def __len__(self):
         return len(self.img_files)
 
-    # def __iter__(self):
-    #     self.count = -1
-    #     print('ran dataset iter')
-    #     #self.shuffled_vector = np.random.permutation(self.nF) if self.augment else np.arange(self.nF)
-    #     return self
-
     def __getitem__(self, index):
-        if self.image_weights:
-            index = self.indices[index]
 
-        hyp = self.hyp
+        # Hyperparameters
+        hyp = self.hyp 
+
+        # Apply random mosaic
         mosaic = self.mosaic and random.random() < hyp['mosaic']
         if mosaic:
+            
             # Load mosaic
             img, labels = load_mosaic(self, index, channels=self.channels)
-            # img, labels = load_mosaic9(self, index)
             shapes = None
 
             # MixUp https://arxiv.org/pdf/1710.09412.pdf
             if random.random() < hyp['mixup']:
                 img2, labels2 = load_mosaic(self, random.randint(0, len(self.labels) - 1), channels=self.channels)
-                # img2, labels2 = load_mosaic9(self, random.randint(0, len(self.labels) - 1))
                 r = np.random.beta(8.0, 8.0)  # mixup ratio, alpha=beta=8.0
                 img = (img * r + img2 * (1 - r)).astype(np.uint8)
                 labels = np.concatenate((labels, labels2), 0)
@@ -309,10 +215,6 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
             if self.channels == 3:
                 augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
 
-            # Apply cutouts
-            # if random.random() < 0.9:
-            #     labels = cutout(img, labels)
-
         nL = len(labels)  # number of labels
         if nL:
             labels[:, 1:5] = xyxy2xywh(labels[:, 1:5])  # convert xyxy to xywh
@@ -332,14 +234,15 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
                 if nL:
                     labels[:, 1] = 1 - labels[:, 1]
 
+        # Convert labels to tensor
         labels_out = torch.zeros((nL, 6))
         if nL:
             labels_out[:, 1:] = torch.from_numpy(labels)
 
-        # Convert
+        # Convert channels
         if self.channels == 1:
             img = np.reshape(img, (img.shape[0], img.shape[1], 1))
-        img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
+        img = img[:, :, ::-1].transpose(2, 0, 1)  # channels x width x height
         img = np.ascontiguousarray(img)
         torch_array = torch.from_numpy(img.copy())
         return torch_array, labels_out, self.img_files[index], shapes
@@ -354,15 +257,23 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
 
 # Ancillary functions --------------------------------------------------------------------------------------------------
 def load_image(self, index, channels=3):
-    # loads 1 image from dataset, returns img, original hw, resized hw
+    # Loads 1 image from dataset, returns img, original hw, resized hw
     img = self.imgs[index]
-    if img is None:  # not cached
+
+    # If the image exists
+    if img is None: # If image is not cached
+
+        # Get the path to the image
         path = self.img_files[index]
+
+        # If number of channels = 3: apply channel augmentations with Canny edge and thresholding
         if channels == 3:
             img = cv2.imread(path)  # BGR
-            img[..., 0] = cv2.Canny(img, 100, 200)
+            img[..., 0] = cv2.Canny(img, 100, 200) # Canny Edge Detector
             img[..., 2] = cv2.adaptiveThreshold(img[..., 1], 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11,
-                                                2)
+                                                2) # Adaptive thresholding
+            
+            # Other experimentations with filters
             # plt.imshow(img)
             # plt.savefig("/data/workspace/mot/current_img.png")
             # plt.close()
@@ -376,26 +287,38 @@ def load_image(self, index, channels=3):
             #     plt.imshow(modified_img)
             # plt.savefig(os.path.join("/data/workspace/mot/modified_imgs.png"))
             # plt.close()
+
+        # If number of channels = 1
         elif channels == 1:
             img = cv2.imread(path, 0)
             img = np.reshape(img, (img.shape[0], img.shape[1], 1))
 
+        # We only support 1 or 3 channel input
         else:
             raise ValueError(f"Expected channels to be 1 or 3, got {channels}")
+
         assert img is not None, 'Image Not Found ' + path
+
         h0, w0 = img.shape[:2]  # orig hw
-        r = self.img_size / max(h0, w0)  # resize image to img_size
+
+        r = self.img_size / max(h0, w0)  # Get ratio based on height and width
+
         assert len(img.shape) == 3, f'1 image shape not 3D, getting {img.shape}'
-        if r != 1:  # always resize down, only resize up if training with augmentation
+
+        # Resize image based on ratio determined
+        if r != 1:
             interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
             img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
             img = np.reshape(img, (img.shape[0], img.shape[1], channels))
+        
         assert len(img.shape) == 3, f'2 image shape not 3D, getting {img.shape}'
-        return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
+
+        return img, (h0, w0), img.shape[:2]  # Img, hw_original, hw_resized
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
 
 
+# Function for augmenting HSV
 def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     r = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain] + 1  # random gains
     hue, sat, val = cv2.split(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
