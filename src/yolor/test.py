@@ -229,6 +229,18 @@ def test(data,
             plot_images(img, targets, paths, f, names)  # labels
             f = save_dir / f'test_batch{batch_i}_pred.jpg'
             plot_images(img, output_to_target(output, width, height), paths, f, names)  # predictions
+
+            # Plot middle channel duplicated 3 times
+            # Get middle channel of image
+            middle_channel = img[:,1:2]
+            middle_channel = middle_channel.repeat(1,3,1,1)
+
+            f = save_dir / f'test_batch{batch_i}_labels_bw.jpg'  # filename
+            plot_images(middle_channel, targets, paths, f, names)  # labels
+
+            f = save_dir / f'test_batch{batch_i}_pred_bw.jpg'
+            plot_images(middle_channel, output_to_target(output, width, height), paths, f, names)  # predictions
+
             
 
     # Compute statistics
