@@ -6,6 +6,8 @@ import cv2
 import pdb
 
 
+# These paths shouldn't need to be changed if you are using the provided docker script and your repository 
+# follows the structure defined in README.md
 DATA_PATH = '/data/workspace/ROB498/data/dataset/'
 OUT_PATH = '/data/workspace/ROB498/data/dataset/coco_format'
 SPLITS = ["TrainReal", "TestReal", "TrainSimulation"]
@@ -15,6 +17,8 @@ CREATE_SPLITTED_DET = True
 
 
 if __name__ == '__main__':
+
+    # generate COCO format for each subset of data
     for split in SPLITS:
         out_path = os.path.join(OUT_PATH, '{}.json'.format(split))
         data_path = os.path.join(DATA_PATH, split, "images/")
@@ -34,8 +38,9 @@ if __name__ == '__main__':
         image_cnt = 0
         ann_cnt = 0
         video_cnt = 0
+
+        # go through every sequence in the dataset
         for seq in sorted(seqs):
-            # Process Tracking Data
             if '.DS_Store' in seq:
                 continue
             video_cnt += 1
@@ -43,12 +48,13 @@ if __name__ == '__main__':
                 'id': video_cnt,
                 'file_name': seq})
             seq_path = '{}/{}/'.format(data_path, seq)
-            ann_path = os.path.join(data_path, "..", "annotations", f"{seq}.csv")  # seq_path + 'gt/gt.txt'
+            ann_path = os.path.join(data_path, "..", "annotations", f"{seq}.csv")
             images = os.listdir(seq_path)
             num_images = len([image for image in images if 'jpg' in image])
-            image_range = [0, num_images - 1]  # note that image numbering doesn't always start at 0
+            image_range = [0, num_images - 1]
+
+            # for each image in the sequence, store its information into dictionary
             for i, file_int in enumerate(sorted([int(image[-14:-4]) for image in images if 'jpg' in image])):
-                # get image size
                 img_file_name = '{}/{}_{:010d}.jpg'.format(seq, seq, file_int)
                 image = Image.open(os.path.join(data_path, img_file_name))
                 image = np.array(image)
@@ -64,12 +70,14 @@ if __name__ == '__main__':
                 out['images'].append(image_info)
             print('{}: {} images'.format(seq, num_images))
 
-            # Process Detection Ground Truth
+            # process detection ground truth (training set only)
             if split != 'test':
                 # for birdsai, anns is: <frame_number>, <object_id>, <x>, <y>, <w>, <h>, <class>, <species>, <occlusion>, <noise>
                 anns = np.loadtxt(ann_path, dtype=np.float32, delimiter=',')
 
                 print(' {} ann images'.format(int(anns[:, 0].max())))
+
+                # collect every detection annotation and its class information
                 for i in range(anns.shape[0]):
                     frame_id = int(anns[i][0])
                     if frame_id - 1 < image_range[0] or frame_id - 1 > image_range[1]:
@@ -88,4 +96,6 @@ if __name__ == '__main__':
             image_cnt += num_images
         print('loaded {} for {} images and {} samples'.format(
             split, len(out['images']), len(out['annotations'])))
+
+        # save to json file
         json.dump(out, open(out_path, 'w'))

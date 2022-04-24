@@ -57,7 +57,7 @@ Running the following command will build a docker image with the image name and 
 $ ./build_docker.sh
 ```
 ### 2. Start a Docker container
-This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) accordingly.
+This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) accordingly. Modify [line 13](setup/docker/run_docker_gpu.sh#l13) to be the directory where you have cloned this repo.
 
 ```
 $ ./run_docker_gpu.sh

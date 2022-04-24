@@ -11,11 +11,9 @@ WORKING_DIR=/data/workspace #${HOME}
 ## mount paths
 # local paths (in ubuntu)
 WORKSPACE_LOCAL=/mnt/d/year_4/rob498
-DATA_LOCAL=/media/trail/datasets
 
 # paths in container
 WORKSPACE_CONTAINER=/data/workspace
-DATA_CONTAINER=/data/datasets
 
 # resources
 MEMORY_LIMIT=30g
@@ -89,19 +87,6 @@ else
   IT=-it  # hard code as interactive for now
 fi
 
-# LOCAL_CODE_FOLDER=${WORKSPACE_LOCAL}/mot
-# DOCKER_CODE_FOLDER=${WORKING_DIR}/mot
-# LOCAL_EXP_FOLDER=${LOCAL_CODE_FOLDER}/logs/${CONTAINER_NAME}
-# DOCKER_EXP_FOLDER=${DOCKER_CODE_FOLDER}/logs/${CONTAINER_NAME}
-# mkdir -p ${LOCAL_EXP_FOLDER}
-
-# LOCAL_CONFIG_FILE=${LOCAL_EXP_FOLDER}/${CONTAINER_NAME}_configs.yaml
-# DOCKER_CONFIG_FILE=${DOCKER_EXP_FOLDER}/${CONTAINER_NAME}_configs.yaml
-# cp $LOCAL_CODE_FOLDER/src/configs/experiment.yaml $LOCAL_CONFIG_FILE
-
-# LOCAL_EXP_SCRIPT=${LOCAL_EXP_FOLDER}/${CONTAINER_NAME}_experiment_script.py
-# DOCKER_EXP_SCRIPT=${DOCKER_EXP_FOLDER}/${CONTAINER_NAME}_experiment_script.py
-# cp $LOCAL_CODE_FOLDER/src/model/run_experiment.py $LOCAL_EXP_SCRIPT
 
 if [[ REMOTE -eq 1 ]]; then
   IT=-itd
@@ -111,7 +96,6 @@ if [[ REMOTE -eq 1 ]]; then
   # NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
   docker run --rm ${IT:-} \
     --mount type=bind,source=${WORKSPACE_LOCAL},target=${WORKSPACE_CONTAINER} \
-    --mount type=bind,source=${DATA_LOCAL},target=${DATA_CONTAINER} \
     -m ${MEMORY_LIMIT} \
     -w ${WORKING_DIR} \
     --name ${CONTAINER_NAME} \
@@ -124,7 +108,6 @@ else
   # NV_GPU=${GPU_DEVICE} docker run --gpus '"device='"${GPU_DEVICE}"'"' --rm ${IT:-} \
   docker run --rm ${IT:-} \
     --mount type=bind,source=${WORKSPACE_LOCAL},target=${WORKSPACE_CONTAINER} \
-    --mount type=bind,source=${DATA_LOCAL},target=${DATA_CONTAINER} \
     -m ${MEMORY_LIMIT} \
     -w ${WORKING_DIR} \
     -e USER=${USER} \
