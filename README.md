@@ -7,7 +7,7 @@ The goal of our project was to build a detection system that can recognize anima
 <summary>[Click to view]</summary>
 
 ```
-ROB498/
+UAV-Thermal-IR-Wildlife-Object-Detection/
 │   README.md
 |   .gitignore
 |   LICENSE
@@ -82,15 +82,15 @@ If you encounter any permission errors when building the image or running the do
 
 ```
 # Training YOLOR with 2 classes on real data only
-$ cd /path/to/repo/ROB498/src/yolor
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolor
 $ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '' --device 0 --name yolor_final_prototype --hyp hyp.scratch.640.yaml --epochs 200
 
 # Testing YOLOR with 2 classes on real data only
-$ cd /path/to/repo/ROB498/src/yolor
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolor
 $ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights /path/to/saved/checkpoint.pt --name yolor_final_prototype_test --verbose --names data/birdsai_2class.names
 
 # Training YOLOR with 2 classes on real data only (Multi-GPU)
-$ cd /path/to/repo/ROB498/src/yolor
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolor
 $ python -m torch.distributed.launch --nproc_per_node 4 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '' --device 0,1,2,3 --sync-bn --name "name_of_project" --hyp hyp.scratch.640.yaml --epochs 200
 ```
 
@@ -102,11 +102,11 @@ $ python -m torch.distributed.launch --nproc_per_node 4 --master_port 9527 train
 
 ```
 # Training YOLOv5 with 2 classes on real data only
-$ cd /path/to/repo/ROB498/src/yolov5
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolov5
 $ python train.py --batch 16 --data birdsai_2class.yaml --cfg yolov5n_birdsai_2class.yaml --weights '' --img 640 --device 0
 
 # Testing YOLOv5 with 2 classes on real data only
-$ cd /path/to/repo/ROB498/src/yolov5
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolov5
 $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task speed
 $ python val.py --weights /path/to/saved/checkpoint.pt --data birdsai_2class.yaml --img 640 --task test
 ```
@@ -136,7 +136,7 @@ We provide an assortment of other possible configurations, for running experimen
 
 All configuration files are provided in the following locations:
 ```
-ROB498/
+UAV-Thermal-IR-Wildlife-Object-Detection/
 └───src/
     └───yolor/
         └───cfg/
@@ -164,11 +164,11 @@ ROB498/
 All commands should follow this format for training and testing on YOLOR:
 ```
 # Training
-$ cd /path/to/repo/ROB498/src/yolor
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolor
 $ python train.py --batch-size 16 --img 640 640 --data birdsai_{X}class.yaml --cfg cfg/yolor_p6_birdsai_{X}class.cfg --weights '' --device 0 --name {NAME_OF_EXPERIMENT} --hyp hyp.{X}.yaml --epochs 200
 
 # Testing
-$ cd /path/to/repo/ROB498/src/yolor
+$ cd /path/to/repo/UAV-Thermal-IR-Wildlife-Object-Detection/src/yolor
 $ python test.py --data birdsai_{X}class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_{X}.cfg --weights /path/to/saved/checkpoint.pt --name {NAME_OF_EXPERIMENT} --verbose --names data/birdsai{X}.names
 ```
 

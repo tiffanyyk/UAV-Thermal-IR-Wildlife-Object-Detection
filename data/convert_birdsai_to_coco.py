@@ -8,8 +8,8 @@ import pdb
 
 # These paths shouldn't need to be changed if you are using the provided docker script and your repository 
 # follows the structure defined in README.md
-DATA_PATH = '/data/workspace/ROB498/data/dataset/'
-OUT_PATH = '/data/workspace/ROB498/data/dataset/coco_format'
+DATA_PATH = '/data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/'
+OUT_PATH = '/data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format'
 SPLITS = ["TrainReal", "TestReal", "TrainSimulation"]
 HALF_VIDEO = True
 CREATE_SPLITTED_ANN = True

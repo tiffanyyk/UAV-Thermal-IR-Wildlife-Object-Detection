@@ -14,7 +14,7 @@ WORKSPACE_LOCAL=/home/tiffany/
 
 # paths in container
 WORKSPACE_CONTAINER=/data/workspace
-DOCKER_CODE_FOLDER=${WORKSPACE_CONTAINER}/ROB498
+DOCKER_CODE_FOLDER=${WORKSPACE_CONTAINER}/UAV-Thermal-IR-Wildlife-Object-Detection
 
 # resources
 MEMORY_LIMIT=30g

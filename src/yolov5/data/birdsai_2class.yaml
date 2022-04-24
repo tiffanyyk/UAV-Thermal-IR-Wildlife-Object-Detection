@@ -1,5 +1,5 @@
 # train and val datasets (image directory or *.txt file with image paths)
-path: /data/workspace/ROB498/data/dataset/coco_format/
+path: /data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format/
 train: TrainReal_2class.json
 val: TestReal_2class.json
 test: TestReal_2class.json

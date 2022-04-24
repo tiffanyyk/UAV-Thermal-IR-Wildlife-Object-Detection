@@ -8,7 +8,7 @@
 
 
 # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: /data/workspace/ROB498/data/dataset/coco_format/  # dataset root dir
+path: /data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format/  # dataset root dir
 train: TrainReal.json
 val: TestReal.json
 test: TestReal.json

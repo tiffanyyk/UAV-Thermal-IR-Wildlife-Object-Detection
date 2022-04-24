@@ -1,7 +1,7 @@
 # train and val datasets (image directory or *.txt file with image paths)
-train: /data/workspace/ROB498/data/dataset/coco_format/TrainReal_3class.json
-val: /data/workspace/ROB498/data/dataset/coco_format/TestReal_3class.json
-test: /data/workspace/ROB498/data/dataset/coco_format/TestReal_3class.json
+train: /data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format/TrainReal_3class.json
+val: /data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format/TestReal_3class.json
+test: /data/workspace/UAV-Thermal-IR-Wildlife-Object-Detection/data/dataset/coco_format/TestReal_3class.json
 
 # number of classes
 nc: 3
