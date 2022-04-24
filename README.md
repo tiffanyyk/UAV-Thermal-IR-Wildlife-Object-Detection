@@ -1,4 +1,4 @@
-# :elephant: ROB498 - Wildlife Protection Through Aerial Drone Surveillance
+# :elephant: Wildlife Protection Through Aerial Drone Surveillance
 The goal of our project was to build a detection system that can recognize animals in thermal infrared aerial images. We investigated YOLOR and YOLOv5, and performed several experiments on the [BIRDSAI](https://sites.google.com/view/elizabethbondi/dataset) dataset before arriving at our final design, shown in the figure below. The final prototype exceeded our design requirement with a mAP of 38.2\% and is well within the hardware constraints of the GPU assumed to be available on the UAV. More details can be found in our [report](assets/ROB498_Final_Report.pdf).
 <p align="center"><img src="assets/design_diagram.png"/></p>
 
