@@ -52,12 +52,12 @@ $ cd setup/docker
 ```
 
 ### 1. Build the Docker image
-Running the following command will build a docker image with the image name and tag specified in lines 4-5 of [`build_docker.sh`](setup/docker/build_docker.sh#l4). Modify this according to your preference. The default is currently set to `tiffanyyk/tiffanyyk:rob498-yolo`.
+Running the following command will build a docker image with the image name and tag specified in lines 4-5 of [`build_docker.sh`](setup/docker/build_docker.sh#L4). Modify this according to your preference. The default is currently set to `tiffanyyk/tiffanyyk:rob498-yolo`.
 ```
 $ ./build_docker.sh
 ```
 ### 2. Start a Docker container
-This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#l4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#l5) accordingly. Modify [line 13](setup/docker/run_docker_gpu.sh#l13) to be the directory where you have cloned this repo.
+This will start a docker container using the image you have just built. If you changed the name of the docker image in [`build_docker.sh`](setup/docker/build_docker.sh#L4), modify lines 5-7 of [`run_docker_gpu.sh`](setup/docker/run_docker_gpu.sh#L5) accordingly. Modify [line 13](setup/docker/run_docker_gpu.sh#L13) to be the directory where you have cloned this repo.
 
 ```
 $ ./run_docker_gpu.sh
