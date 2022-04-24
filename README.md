@@ -46,6 +46,7 @@ ROB498/
 ## :hammer: Environment Setup
 <details open>
 <summary>[Click to view]</summary>
+
 To replicate the results in our report, we recommend using the Docker setup provided in this repository. All the relevant files are located in [`setup/docker`](setup/docker). To set this up, do the following:
 ```
 $ cd setup/docker
