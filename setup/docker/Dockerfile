@@ -15,6 +15,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ## stuff for yolov5
 RUN pip install seaborn
+RUN pip install tqdm==4.63.1
 
 RUN apt-get update && apt-get install -y ssh openssh-server net-tools
 

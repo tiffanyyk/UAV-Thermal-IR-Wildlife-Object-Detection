@@ -1,10 +1,10 @@
+import os
 import sys
-sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
+sys.path.insert(0, os.environ.get('CODE_FOLDER', '.'))
 
 import argparse
 import glob
 import json
-import os
 from pathlib import Path
 
 import numpy as np

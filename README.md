@@ -52,7 +52,7 @@ $ cd setup/docker
 ```
 
 ### 1. Build the Docker image
-Running the following command will build a docker image with the image name and tag specified in lines 4-5 of [`build_docker.sh`](setup/docker/build_docker.sh#L4). Modify this according to your preference. The default is currently set to `tiffanyyk/tiffanyyk:rob498-yolo`.
+Running the following command will build a docker image with the image name and tag specified in lines 4-5 of [`build_docker.sh`](setup/docker/build_docker.sh#L4). Modify this according to your preference. The default is currently set to `uav-tir-wildlife-od/uav-tir-wildlife-od:rob498-yolo`.
 ```
 $ ./build_docker.sh
 ```
@@ -82,15 +82,15 @@ If you encounter any permission errors when building the image or running the do
 ```
 # Training YOLOR with 2 classes on real data only
 $ cd /path/to/repo/ROB498/src/yolor
-$ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0 --name yolor_final_prototype --hyp hyp.scratch.640.yaml --epochs 200
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '' --device 0 --name yolor_final_prototype --hyp hyp.scratch.640.yaml --epochs 200
 
 # Testing YOLOR with 2 classes on real data only
 $ cd /path/to/repo/ROB498/src/yolor
-$ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class.cfg --weights /path/to/saved/checkpoint.pt --name yolor_final_prototype_test --verbose --names data/birdsai_2class.names
+$ python test.py --data birdsai_2class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights /path/to/saved/checkpoint.pt --name yolor_final_prototype_test --verbose --names data/birdsai_2class.names
 
 # Training YOLOR with 2 classes on real data only (Multi-GPU)
 $ cd /path/to/repo/ROB498/src/yolor
-$ python -m torch.distributed.launch --nproc_per_node 4 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class.cfg --weights '' --device 0,1,2,3 --sync-bn --name "name_of_project" --hyp hyp.scratch.640.yaml --epochs 200
+$ python -m torch.distributed.launch --nproc_per_node 4 --master_port 9527 train.py --batch-size 16 --img 640 640 --data birdsai_2class.yaml --cfg cfg/yolor_p6_birdsai_2class_origanchors.cfg --weights '' --device 0,1,2,3 --sync-bn --name "name_of_project" --hyp hyp.scratch.640.yaml --epochs 200
 ```
 
 </details>
@@ -142,17 +142,17 @@ ROB498/
             |   yolor_p6_birdsai_2class_origanchors.cfg
             |   yolor_p6_birdsai_2class_newanchors.cfg
             |   yolor_p6_birdsai_3class.cfg
-            |   yolor_p6_birdsai.cfg
+            |   yolor_p6_birdsai_10class.cfg
         └───data/
             |   birdsai_2class.names
             |   birdsai_2class.yaml
             |   birdsai_3class.names
             |   birdsai_3class.yaml
-            |   birdsai.names
+            |   birdsai_10class.names
             |   birdsai_10class.yaml
-            |   hyp.finetune.1280
-            |   hyp.scratch.1280
-            |   hyp.scratch.640
+            |   hyp.finetune.1280.yaml
+            |   hyp.scratch.1280.yaml
+            |   hyp.scratch.640.yaml
     └───yolov5/
         └───data/
             |   birdsai_2class.yaml
@@ -162,11 +162,11 @@ ROB498/
 
 All commands should follow this format for training and testing on YOLOR:
 ```
-# Training YOLOR with 2 classes on real data only
+# Training
 $ cd /path/to/repo/ROB498/src/yolor
-$ python train.py --batch-size 16 --img 640 640 --data birdsai_{X}class.yaml --cfg cfg/yolor_p6_birdsai_{X}.cfg --weights '' --device 0 --name {NAME_OF_EXPERIMENT} --hyp hyp.{X}.yaml --epochs 200
+$ python train.py --batch-size 16 --img 640 640 --data birdsai_{X}class.yaml --cfg cfg/yolor_p6_birdsai_{X}class.cfg --weights '' --device 0 --name {NAME_OF_EXPERIMENT} --hyp hyp.{X}.yaml --epochs 200
 
-# Testing YOLOR with 2 classes on real data only
+# Testing
 $ cd /path/to/repo/ROB498/src/yolor
 $ python test.py --data birdsai_{X}class.yaml --img 640 --batch 32 --conf 0.001 --iou 0.65 --device 0 --cfg cfg/yolor_p6_birdsai_{X}.cfg --weights /path/to/saved/checkpoint.pt --name {NAME_OF_EXPERIMENT} --verbose --names data/birdsai{X}.names
 ```

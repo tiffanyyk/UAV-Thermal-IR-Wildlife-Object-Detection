@@ -1,7 +1,7 @@
 #!/bin/bash
 readonly SCRIPT_DIR=$(dirname "$(readlink -f "${BASH_SOURCE}"c)")
-DOCKER_REGISTRY=tiffanyyk
-IMAGE_NAME=${DOCKER_REGISTRY}/tiffanyyk
+DOCKER_REGISTRY=uav-tir-wildlife-od
+IMAGE_NAME=${DOCKER_REGISTRY}/uav-tir-wildlife-od
 TAG=rob498-yolo
 BASE_IMG=nvcr.io/nvidia/pytorch:20.11-py3
 DOCKER_FILENAME=Dockerfile

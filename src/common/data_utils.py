@@ -109,13 +109,43 @@ class LoadImagesAndLabels_COCO(Dataset):  # for training/testing
         # Number of images
         n = len(self.img_files)
         self.n = n
-        
+        self.shapes = np.repeat(
+            np.reshape(np.array([518, 698]), (1, 2)),
+            n,
+            axis=0
+        )
+
         # Batch index for images
         bi = np.floor(np.arange(n) / batch_size).astype(np.int)  
         self.batch = bi
 
         # Number of batches
         nb = bi[-1] + 1
+
+        # Rectangular inference. Only used by YOLOv5
+        if self.rect:
+            # Sort by aspect ratio
+            s = self.shapes  # wh
+            ar = s[:, 1] / s[:, 0]  # aspect ratio
+            irect = ar.argsort()
+            self.img_files = [self.img_files[i] for i in irect]
+
+            # self.label_files = [self.label_files[i] for i in irect]
+            self.labels = [self.labels[i] for i in irect]
+            self.shapes = s[irect]  # wh
+            ar = ar[irect]
+
+            # Set training image shapes
+            shapes = [[1, 1]] * nb
+            for i in range(nb):
+                ari = ar[bi == i]
+                mini, maxi = ari.min(), ari.max()
+                if maxi < 1:
+                    shapes[i] = [maxi, 1]
+                elif mini > 1:
+                    shapes[i] = [1, 1 / mini]
+
+            self.batch_shapes = np.ceil(np.array(shapes) * img_size / stride + pad).astype(np.int) * stride
 
         self.label_files = self.img_files  # Label files correspond to image files 
         nm, nf, ne, ns, nd = 0, 0, 0, 0, 0  # Number missing, found, empty, datasubset, duplicate

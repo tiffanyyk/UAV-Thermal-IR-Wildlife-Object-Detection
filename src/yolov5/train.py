@@ -11,12 +11,12 @@ Usage:
     $ python path/to/train.py --data coco128.yaml --weights yolov5s.pt --img 640  # from pretrained (RECOMMENDED)
     $ python path/to/train.py --data coco128.yaml --weights '' --cfg yolov5s.yaml --img 640  # from scratch
 """
+import os
 import sys
-sys.path.append('/scratch/ssd002/home/helen/school/ROB498')
+sys.path.insert(0, os.environ.get('CODE_FOLDER', '.'))
 
 import argparse
 import math
-import os
 import random
 import sys
 import time
