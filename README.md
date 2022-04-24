@@ -18,7 +18,6 @@ ROB498/
     │   convert_birdsai_to_coco.py -- script to convert BIRDSAI dataset to COCO format
     |   count_classes.py -- script to determine the number of samples in each object class
     |   Anchor_Statistics.ipynb -- K-means to determine anchors for YOLOR
-    └───utils/ -- folder containing code for BIRDSAI data handling which we didn't use
     └───dataset/ (store dataset files here)
         └───TrainReal/
             └───annotations/
@@ -141,7 +140,7 @@ ROB498/
     └───yolor/
         └───cfg/
             |   yolor_p6_birdsai_2class_origanchors.cfg
-            |   yolor_p6_birdsai_2class_origanchors_1channel.cfg
+            |   yolor_p6_birdsai_2class_newanchors.cfg
             |   yolor_p6_birdsai_3class.cfg
             |   yolor_p6_birdsai.cfg
         └───data/
