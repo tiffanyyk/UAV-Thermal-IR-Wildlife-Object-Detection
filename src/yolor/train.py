@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.insert(0, os.environ.get('CODE_FOLDER', '.'))
+sys.path.insert(0, os.environ.get('CODE_FOLDER', '../..'))
 
 import argparse
 import logging
